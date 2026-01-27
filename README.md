@@ -1,36 +1,190 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Next.js Firebase Auth + TypeORM PostgreSQL
 
-## Getting Started
+A **full‑stack authentication and dashboard system** built with **Next.js (App Router)**, **Firebase Authentication**, **TypeORM**, and **PostgreSQL**.
+The project demonstrates clean auth flow, route protection, and syncing Firebase users with a SQL database.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 🚀 Features
+
+* ✅ Firebase Email/Password Authentication
+* 🔐 Protected routes (Dashboard)
+* 🚫 Auth pages hidden after login (Login / Signup restriction)
+* 🗄 PostgreSQL integration using TypeORM
+* 🔄 Sync Firebase users to database
+* ⚡ React Query for data fetching
+* 🎨 Dark / Light mode toggle
+* 🧠 Clean client‑side auth handling
+
+---
+
+## 🧱 Tech Stack
+
+| Layer         | Technology               |
+| ------------- | ------------------------ |
+| Frontend      | Next.js 16 (App Router)  |
+| Auth          | Firebase Authentication  |
+| Backend       | Next.js API Routes       |
+| ORM           | TypeORM                  |
+| Database      | PostgreSQL               |
+| Data Fetching | TanStack React Query     |
+| UI            | Tailwind CSS + shadcn/ui |
+
+---
+
+## 📂 Project Structure
+
+```txt
+src/
+├── app/
+│   ├── auth/
+│   │   ├── login/
+│   │   └── sign-up/
+│   ├── dashboard/
+│   └── api/
+│       └── users/
+├── components/
+├── entities/
+├── repositories/
+├── services/
+├── lib/
+│   ├── firebase.ts
+│   └── datasource.ts
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🔐 Authentication Flow
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. User signs up / logs in via **Firebase Auth**
+2. Firebase returns authenticated user
+3. User is redirected to `/dashboard`
+4. Dashboard is protected via `onAuthStateChanged`
+5. Auth pages auto‑redirect if user is already logged in
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## 🔒 Route Protection (Minimal Pattern)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Used on **dashboard**, **login**, and **signup** pages:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```ts
+useEffect(() => {
+  const unsub = onAuthStateChanged(auth, user => {
+    if (!user) router.replace('/auth/login')
+  })
+  return () => unsub()
+}, [])
+```
 
-## Deploy on Vercel
+And for auth pages:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```ts
+if (user) router.replace('/dashboard')
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## 🗄 Database (PostgreSQL + TypeORM)
+
+### User Entity Example
+
+```ts
+@Entity()
+export class User {
+  @PrimaryGeneratedColumn()
+  id: number
+
+  @Column({ nullable: true })
+  firstName: string
+
+  @Column({ nullable: true })
+  lastName: string
+
+  @Column({ unique: true })
+  email: string
+
+  @Column({ default: true })
+  isActive: boolean
+
+  @CreateDateColumn()
+  createdAt: Date
+}
+```
+
+---
+
+## 🌐 API Example
+
+```ts
+GET /api/users
+```
+
+* Initializes database
+* Fetches users using TypeORM repository
+* Returns JSON response
+
+---
+
+## ⚙️ Environment Variables
+
+Create `.env.local`:
+
+```env
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=your_password
+DB_NAME=next_js_database
+
+NEXT_PUBLIC_FIREBASE_API_KEY=xxxxx
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=xxxxx
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=xxxxx
+```
+
+---
+
+## 🧪 Development
+
+```bash
+npm install
+npm run dev
+```
+
+App runs on:
+
+```
+http://localhost:3000
+```
+
+---
+
+## 🧠 Key Learnings
+
+* Firebase handles **authentication**, not authorization
+* Route protection must happen on **client + server**
+* `onAuthStateChanged` is the source of truth
+* TypeORM should be **singleton‑initialized** in Next.js
+* React Query avoids unnecessary refetching
+
+---
+
+## 📌 Future Improvements
+
+* Middleware‑based auth protection
+* Role‑based access (admin / user)
+* Server Actions for auth sync
+* Email verification & password reset
+
+---
+
+## 👤 Author
+
+**Ibrahim Amjad**
+Web Developer – Next.js, Firebase, PostgreSQL
+
+---
+
+## 📄 License
+
+MIT License

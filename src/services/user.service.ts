@@ -32,3 +32,4 @@ export const deleteUser = async (
 ): Promise<void> => {
   await api.delete(`/users/${id}`);
 };
+

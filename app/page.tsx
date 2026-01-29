@@ -31,7 +31,7 @@ export default function Home() {
             Go to sign-in
           </a>
 
-          <a href="/dashboard"
+          <a href="/feed"
             className="w-full text-center rounded-lg border border-gray-300 dark:border-gray-700 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-600  hover:text-white">
             Go to Dashboard
           </a>

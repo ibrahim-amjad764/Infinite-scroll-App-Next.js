@@ -5,3 +5,4 @@ export async function initDB() {
         await AppDataSource.initialize();
     }
 }
+

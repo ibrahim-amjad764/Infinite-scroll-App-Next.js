@@ -131,23 +131,14 @@
 //             </div>
 //         </main>
 //     )
-// }
+// bg-gradient-to-tr from-gray-900 via-gray-800 to-gray-700}
 
-
-import { SignupForm } from "@/src/components/signup-page-01/signup-form"
+import { SignupForm } from "@/src/components/membership/signup-page-01/signup-form"
 
 export default function Page() {
-    return (
-        <div className="flex min-h-screen w-full items-center justify-center p-6 md:p-10 bg-[#F3F4F4]">
-            <div className="w-full max-w-sm">
-                <h1 className="text-3xl font-bold text-foreground dark:text-foreground text-center italic">
-                    Welcome to Firebase Authentication!
-                </h1>
-                <p className="text-center text-sm text-muted-foreground mt-2">
-                    Start your journey by creating your account below.
-                </p>
-                <SignupForm />
-            </div>
-        </div>
-    )
+  return (
+    <div >
+      <SignupForm />
+    </div>
+  )
 }

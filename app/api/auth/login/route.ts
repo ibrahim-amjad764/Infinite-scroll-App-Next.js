@@ -24,15 +24,25 @@ export async function POST(req: Request) {
     const repo = AppDataSource.getRepository(User);
     // find DB user
     const user = await repo.findOneBy({ email: decode.email! });
-
     if (!user) {
       console.log("DB user not found");
       return NextResponse.json({ message: "User not found in DB" }, { status: 404 });
     }
     console.log("Returning DB user:", user.email);
-    return NextResponse.json(user);
+// ✅ create response
+    const response = NextResponse.json(user);
+    // ✅ set cookie on response
+    response.cookies.set("auth-token", token, {
+      httpOnly: true, // JS/browser se access nahi → secure
+      sameSite: "lax",  // CSRF attacks se bachao (Lax is safe for normal logins)
+      secure: process.env.NODE_ENV === "production", // sirf HTTPS in prod
+      path: "/", // poori website ke liye
+      maxAge: 60 * 60,  // cookie expire 1 ghante me
+    });
+    return response;
   } catch (err: any) {
     console.error("Login API Error:", err.message || err);
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
+
 }

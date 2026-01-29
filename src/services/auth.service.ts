@@ -1,12 +1,13 @@
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "@/src/lib/firebase"
+// import { auth } from "@/src/lib/firebase"
 import { signOut } from "firebase/auth";
-
+import { getAuth } from "firebase/auth"
+import { app } from "@/src/lib/firebase"
 
 // Sign UP
 export async function signUp(email: string, password: string) {
   console.log("Sign-Up Start");
-//  firebase cred object return user info & provide token method
+  //  firebase cred object return user info & provide token method
   const cred = await createUserWithEmailAndPassword(auth, email, password);
   console.log("FireBase User Created:", cred.user.uid);
 
@@ -64,11 +65,11 @@ export async function signIn(email: string, password: string) {
     console.log("DB User Fetched:", user);
 
     return normalizeUser(user);
-    
+
   } catch (err: any) {
     if (err.code) {
       switch (err.code) {
-         case "auth/invalid-email":
+        case "auth/invalid-email":
           console.error("Invalid Email Format");
           break;
         case "auth/user-not-found":
@@ -87,13 +88,25 @@ export async function signIn(email: string, password: string) {
   }
 }
 // Logout
+
+const auth = getAuth(app)
 export const logout = async () => {
   try {
-    await signOut(auth);
+    // 1️⃣ Sign out from Firebase client
+    await signOut(auth)
+
+    // 2️⃣ Call server API to delete cookie
+    await fetch("/api/auth/logout", {
+      method: "POST",
+      credentials: "include", // important so cookie is sent
+    })
+
+    console.log("Logout successful")
   } catch (error) {
-    console.error("Logout failed:", error);
-    throw error;
+    console.error("Logout failed:", error)
+    throw error
   }
-};
+}
+
 
 

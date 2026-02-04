@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { getAuth, createUserWithEmailAndPassword, signOut } from "firebase/auth"
+import { getAuth, createUserWithEmailAndPassword,} from "firebase/auth"
 import { app } from "@/src/lib/firebase"
 
 async function saveUserToDB(idToken: string) {
@@ -30,16 +30,6 @@ async function saveUserToDB(idToken: string) {
 
 export function SignupForm({ className, ...props }: React.ComponentProps<"div">) {
   const router = useRouter()
-  const auth = getAuth(app)
-
-  useEffect(() => {
-    const unsub = auth.onAuthStateChanged((user) => {
-      if (user) {
-        router.replace("/feed")
-      }
-    })
-    return () => unsub()
-  }, [auth, router])
 
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
@@ -73,18 +63,29 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"div">)
     const toastId = toast.loading("Creating your account...")
 
     try {
+      const auth = getAuth(app)
+
+      // Create Firebase user
       const cred = await createUserWithEmailAndPassword(auth, email, password)
       console.log("Firebase User Created:", cred.user.uid)
 
+      // Get ID token from Firebase
       const idToken = await cred.user.getIdToken(true)
       console.log("Token Issued:", idToken.slice(0, 20), "...")
 
+      // Send token + optional user info to backend for DB & cookie
+    await fetch("/api/auth/signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ idToken, name, email }),
+    })
+
+    // saved to db user
       await saveUserToDB(idToken)
       toast.success("Account created successfully", { id: toastId })
 
-      await signOut(auth)
+      router.replace("/feed")
 
-      router.push("/auth/login")
     } catch (err: any) {
       console.error("Signup failed:", err.message || err)
       toast.error(err.message || "Signup failed. Please try again.", { id: toastId })
@@ -94,7 +95,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"div">)
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-tr from-gray-900 via-gray-800 to-gray-700 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-tr from-gray-800 via-gray-900 to-gray-600 px-4">
       <div className="bg-white/5 backdrop-blur-md rounded-3xl p-5 max-w-md w-full border border-white/25 shadow-lg">
 
         {/* Top Heading */}

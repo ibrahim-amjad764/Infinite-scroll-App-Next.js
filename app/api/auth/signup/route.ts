@@ -2,11 +2,12 @@ import { NextResponse } from "next/server";
 import admin from "@/src/lib/firebase-admin";
 import { initDB } from "@/src/db/init-db";
 import { AppDataSource } from "@/src/db/data-source";
-import { User } from "@/src/entities/User";
-
+import { User } from "@/src/entities/user";
+// POST
 export async function POST(req: Request) {
   try {
     await initDB();
+      if (!AppDataSource.isInitialized) await AppDataSource.initialize();
 
     // Read token form body
     const { idToken } = await req.json();

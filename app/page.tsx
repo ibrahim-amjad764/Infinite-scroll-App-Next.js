@@ -10,10 +10,12 @@ export default function Home() {
   return (
     <main
       className={clsx(
-        "flex min-h-screen items-center justify-center px-4 ",
-        darkMode ? "dark bg-black" : "bg-gray-50"
+        "flex min-h-screen items-center justify-center px-4",
+        darkMode
+          ? "dark bg-gradient-to-tr from-gray-900 via-gray-800 to-gray-700"
+          : "bg-gray-50"
       )}>
-      <div className="w-full max-w-md rounded-2xl border border-gray-200 dark:border-zinc-500 bg-white dark:bg-zinc-800 p-8 shadow-lg">
+      <div className="w-full max-w-md rounded-2xl border border-gray-200 dark:border-zinc-500 bg-[#F5F2F2] dark:bg-[#233D4D] p-8 shadow-lg">
         <h1 className="text-3xl  text-gray-600 font-extrabold text-center dark:text-gray-300">
           Welcome to
         </h1>
@@ -32,7 +34,7 @@ export default function Home() {
           </a>
 
           <a href="/feed"
-            className="w-full text-center rounded-lg border border-gray-300 dark:border-gray-700 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-600  hover:text-white">
+            className="w-full text-center rounded-lg border border-gray-300 dark:border-gray-400 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-600  hover:text-white">
             Go to Dashboard
           </a>
 

@@ -1,6 +1,32 @@
 import { initDB } from "@/src/db/init-db";
 import { AppDataSource } from "@/src/db/data-source";
-import { User } from "@/src/entities/User";
+import { User } from "@/src/entities/user";
+
+// GET
+// GET user by id
+export async function GET(
+  _req: Request,
+  context: { params: Promise<{ id: string }> }
+) {
+  try {
+    await initDB();
+
+    const { id } = await context.params;
+    const userId = Number(id);
+
+    const repo = AppDataSource.getRepository(User);
+    const user = await repo.findOneBy({ id: userId });
+
+    if (!user) {
+      return Response.json({ message: "User not found" }, { status: 404 });
+    }
+
+    return Response.json(user);
+  } catch (err) {
+    console.error("GET USER ERROR:", err);
+    return Response.json({ error: "Fetch failed" }, { status: 500 });
+  }
+}
 
 // PATCH
 export async function PATCH(

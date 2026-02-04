@@ -48,7 +48,7 @@ const LoginForm = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-tr from-gray-900 via-gray-800 to-gray-700 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-tr from-gray-700 via-gray-800 to-gray-600 px-4">
       <div className="bg-white/5 backdrop-blur-md rounded-3xl p-15 max-w-md w-full border border-white/25 shadow-lg">
         {/* Top Title and Subtitle (from first snippet) */}
         <div className="flex justify-center mb-8">
@@ -110,7 +110,7 @@ const LoginForm = () => {
               <Checkbox id="remember" />
               <span>Remember me</span>
             </label>
-            <a href="/forgot-password" className="hover:underline">
+            <a href="/auth/forgot-password" className="hover:underline">
               Forgot password?
             </a>
           </div>
@@ -118,7 +118,7 @@ const LoginForm = () => {
           {/* Submit button */}
           <Button
             type="submit" disabled={loading}
-            className="w-full bg-gradient-to-r from-gray-600 to-gray-800 rounded-full py-3 text-white font-semibold tracking-wide hover:brightness-125 transition disabled:opacity-60">
+            className="w-full bg-gradient-to-r from-gray-600 to-gray-800 rounded-full py-3  text-white font-semibold tracking-wide hover:brightness-125 transition disabled:opacity-60">
             {loading ? "Logging in..." : "LOGIN"}
           </Button>
 

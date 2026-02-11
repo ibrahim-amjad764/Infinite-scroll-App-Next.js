@@ -33,12 +33,23 @@ const LoginForm = () => {
     const toastId = toast.loading("Signing in...")
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password)
-      const token = await userCredential.user.getIdToken() //logged user get firebase token
-      await fetch("/api/auth/login", { //token send to backend api to set cookie
+      const token = await userCredential.user.getIdToken()
+      console.log("Firebase token:", token) //logged user get firebase token
+      const res = await fetch("/api/auth/login", { //token send to backend api to set cookie
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
       })
-      toast.success("Login successful", { id: toastId })
+      const data = await res.json()
+      console.log("Login API response:", data)
+
+      // toast.success("Login successful", { id: toastId })
+toast.success(`Welcome, ${data.email}!`, {
+  id: toastId,
+})
+
+// redirect after toast
+router.replace("/feed")
+
       router.replace("/feed")
     } catch (error: any) {
       toast.error(error.message || "Invalid email or password", { id: toastId })

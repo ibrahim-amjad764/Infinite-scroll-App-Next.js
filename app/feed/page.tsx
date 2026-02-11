@@ -76,16 +76,13 @@
 //   time?: string;
 // }
 
-
 // const fetchPosts = async (): Promise<Post[]> => {
 //   const res = await fetch("/api/posts");
 
 //   if (!res.ok) {
 //     throw new Error("Failed to fetch posts");
 //   }
-
 //   const data = await res.json();
-
 //   // Check if the data is an array, otherwise return an empty array
 //   if (Array.isArray(data)) {
 //     return data;
@@ -96,8 +93,6 @@
 //     return []; // Return an empty array if the structure is unexpected
 //   }
 // };
-
-
 
 // export default function FeedPage() {
 //   const { data: posts = [], isLoading, error } = useQuery<Post[]>({
@@ -229,23 +224,23 @@
 
 
 
+
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect , useRef} from 'react';
+import Image from 'next/image';
 import { useQuery } from '@tanstack/react-query';
+import { Heart, MessageCircle, Share2 } from 'lucide-react';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Heart, MessageCircle, Share2 } from 'lucide-react';
 import { Navbar } from '@/src/components/navbar/navbar';
-import Image from 'next/image';
-import InfiniteScroll from '@/src/components/ui/infinite-scroll'; // Infinite scroll component
-import { Loader2 } from 'lucide-react';
-import { toast } from 'sonner';
+import { SkeletonLoader } from '@/components/ui/SkeletonLoader'; // Skeleton Loader Component
+import { renderUser } from '@/src/types/renderUser'; // User Rendering Helper
+import InfiniteScroll from 'react-infinite-scroll-component'; // Infinite Scroll Component
+import { Loader2 } from 'lucide-react'; // Loader icon
 
-/* =========================
-   Types for Post and User
-========================= */
+// User Type
 interface User {
   id: string;
   firstName?: string | null;
@@ -256,173 +251,128 @@ interface User {
 interface Post {
   id: string;
   content: string;
-  images?: string[]; // Optional images array
+  images?: string[]; // undefined
   createdAt: string;
   user: User;
   time?: string;
-  comments?: string[]; // Adding a comments array for each post
 }
 
-interface PostsResponse {
+interface FetchPostsResponse {
   posts: Post[];
   hasMore: boolean;
 }
 
-/* =========================
-   Fetch Posts from API
-========================= */
-const fetchPosts = async (page: number): Promise<{ posts: Post[]; hasMore: boolean }> => {
-  try {
-    const res = await fetch(`/api/posts?page=${page}&limit=5`);
-
-    // Check if the response is successful (status code 200)
-    if (!res.ok) {
-      throw new Error(`Failed to fetch posts: ${res.statusText}`);
-    }
-
-    const data = await res.json();
-
-    // Ensure the data is in the correct format
-    if (!data || !Array.isArray(data.posts)) {
-      throw new Error('Unexpected response format from the server');
-    }
-
-    // Calculate if there are more posts
-    const hasMore = data.posts.length === 5; // If less than 5 posts are returned, there are no more posts
-
-    return { posts: data.posts, hasMore };
-  } catch (error) {
-    console.error('Error fetching posts:', error);
-    throw new Error('An error occurred while fetching posts');
+// Page with pagination
+const fetchPosts = async (page: number): Promise<FetchPostsResponse> => {
+  const res = await fetch(`/api/posts?page=${page}&limit=5`);
+  if (!res.ok) {
+    throw new Error("Failed to fetch posts");
   }
+  const data = await res.json();
+  if (Array.isArray(data)) return { posts: data, hasMore: true }; // If response is an array, assume more posts might exist
+  return { posts: data.posts || [], hasMore: data.hasMore || false };
 };
 
-/* =========================
-   Feed Page Component
-========================= */
+// Feed Page Component
 export default function FeedPage() {
-  /* -------------------------
-     State Variables
-  ------------------------- */
-  const [page, setPage] = useState(1);              // Current page number for pagination
-  const [allPosts, setAllPosts] = useState<Post[]>([]); // Accumulated posts to display
-  const [hasMore, setHasMore] = useState(true);     // Flag to determine if more posts are available
-  const [isDelayLoading, setIsDelayLoading] = useState(false); // Simulate delay loader
-  const [activeIndices, setActiveIndices] = useState<{ [key: string]: number }>({}); // Active index for image carousel
+  const [activeIndices, setActiveIndices] = useState<Record<string, number>>({}); // State to manage active image index for each post
+  const [delayedLoading, setDelayedLoading] = useState(true); // State to manage delayed loading for skeleton UI
+  const [page, setPage] = useState(1); // State to manage current page for pagination
+  const [hasMore, setHasMore] = useState(true); // State to manage if more posts are available for infinite scroll
+  const [loading, setLoading] = useState(false); // State to manage loading state for infinite scroll
+  const [allPosts, setAllPosts] = useState<Post[]>([]); // State to store all fetched posts
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null); // Ref to manage the scroll container
 
-  /* -------------------------
-     Fetch Posts using React Query
-  ------------------------- */
-  const { data, isFetching, error } = useQuery({
-    queryKey: ['posts', page],
-    queryFn: () => fetchPosts(page), // Function to fetch posts
-    placeholderData: (previousData) => previousData, // Prevent UI jump by using previous data if available
+  const { data, isLoading, isError } = useQuery<FetchPostsResponse>({
+    queryKey: ["posts", page], // Unique query key that includes page number for caching
+    queryFn: () => fetchPosts(page), // Query function that fetches posts based on current page
+    retry: 2, // Retry failed requests up to 2 times
+    placeholderData: (previousData) => previousData, // Keeps previous data while loading new page
   });
 
-  /* -------------------------
-     Handle New Data and Loading
-  ------------------------- */
   useEffect(() => {
-    if (!data) return;
-
-    console.log("Fetched data:", data);
-
-    setIsDelayLoading(true);
-
-    const timer = setTimeout(() => {
-      if (Array.isArray(data.posts) && data.posts.length > 0) {
-        console.log("Appending posts:", data.posts);
-        setAllPosts((prev) => [...prev, ...data.posts]); // Append newly fetched posts
-        setHasMore(data.hasMore);                         // Update hasMore based on the response
-      } else {
-        console.log("No more posts, setting hasMore to false");
-        setHasMore(false); // If no posts are returned, disable further loading
-      }
-      setIsDelayLoading(false);
-    }, 4000); // Delay to simulate loading effect
-
-    return () => clearTimeout(timer); // Clean up timer on component unmount
+    if (data?.posts) {
+      setAllPosts((prev) => [...prev ,...data.posts]); // Append new posts to the top
+      setHasMore(data.hasMore); // Update hasMore based on API response
+    }
   }, [data]);
 
-  /* -------------------------
-     Load More Posts on Scroll
-  ------------------------- */
+  // Simulate a loading delay
+  useEffect(() => {
+    if (!isLoading && !isError) {
+      const timer = setTimeout(() => {
+        setDelayedLoading(false);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading, isError]);
+
+  const nextImage = (postId: string, length: number) => {
+    setActiveIndices((prev) => ({
+      ...prev,
+      [postId]: Math.min((prev[postId] ?? 0) + 1, length - 1),
+    }));
+  }; // Function to handle next image in carousel
+
+  const prevImage = (postId: string) => {
+    setActiveIndices((prev) => ({
+      ...prev,
+      [postId]: Math.max((prev[postId] ?? 0) - 1, 0),
+    }));
+  }; // Function to handle previous image in carousel
+
+  // Function to load more posts when the user scrolls to the end
   const loadMorePosts = () => {
-    if (!isFetching && hasMore && !isDelayLoading) {
-      setPage((prev) => prev + 1); // Increment page number to load the next set of posts
+    if (!loading && hasMore) {
+      setLoading(true);
+      setTimeout(() => {
+        setPage((prev) => prev + 1); // Increment page number to fetch the next set of posts
+        setLoading(false);
+      }, 1000); // Simulate a slight delay before loading new posts
     }
   };
 
-  /* -------------------------
-     Initial Loading State
-  ------------------------- */
-  if (page === 1 && allPosts.length === 0 && isFetching) {
-    return (
-      <div className="text-center py-6">
-        <Loader2 className="my-4 h-8 w-8 animate-spin" />
-        Loading posts...
-      </div>
-    );
-  }
+  if (isLoading || delayedLoading) return <SkeletonLoader />; // Show skeleton loader while loading or if loading takes too long
+  if (isError) return <p className="text-center py-10">Something Went Wrong.</p>;
+  if (data?.posts.length === 0) return <p className="text-center py-10">No posts yet.</p>;
 
-  if (error instanceof Error) {
-    return (
-      <div className="text-center py-6 text-red-600">
-        {/* Display error message if an error occurs */}
-        {error.message}
-      </div>
-    );
-  }
+  // const posts = data?.posts || []; // Extract posts from query data
+  const posts = allPosts; // Use allPosts state which contains all fetched posts
+  const hasMoreData = data?.hasMore || false; // Extract hasMore from query data
 
-  /* =========================
-     Render Feed Page
-  ========================= */
   return (
     <>
-      <Navbar /> {/* Render the navigation bar */}
-
-      {/* Infinite Scroll Component */}
-      <InfiniteScroll
-        next={loadMorePosts} // Function to load more posts
-        hasMore={hasMore} // Whether there are more posts to load
-        isLoading={isFetching || isDelayLoading} // Loading state
-        loader={
-          <div className="text-center py-4" key="loader">
-            <Loader2 className="my-4 h-8 w-8 animate-spin" />
-            Loading posts...
-          </div>
-        }
-        endMessage={
-          <p className="text-center py-4 text-muted-foreground" key="end">
-            No more posts to show.
-          </p>
-        }
-      >
-        <div className="mx-auto max-w-xl flex flex-col gap-6 py-6">
-          {allPosts.map((post) => {
-            const firstName = post.user.firstName ?? 'Anonymous';
-            const lastName = post.user.lastName ?? '';
-
-            // Initialize activeIndex for image carousel if not already set
-            if (activeIndices[post.id] === undefined) {
-              setActiveIndices((prev) => ({
-                ...prev,
-                [post.id]: 0, // Initialize first image as active
-              }));
-            }
+      <Navbar />
+      <div className="mx-auto max-w-xl flex flex-col gap-6 py-6" ref= {scrollContainerRef}>
+        <InfiniteScroll
+          dataLength={posts.length}
+          next={loadMorePosts}
+          hasMore={hasMoreData}
+          loader={
+            <div className="flex justify-center my-4">
+              <Loader2 className="h-8 w-8 animate-spin" />
+            </div>
+          }
+          endMessage={<p className="flex justify-center py-4">No more posts to show</p>}
+          scrollThreshold={0.9}
+        >
+          {posts.map((post, index) => {
+            console.log("Post ID: ", post.id);
+            const activeIndex = activeIndices[post.id] ?? 0;
+            const safeUser = {
+              ...post.user,
+              firstName: post.user.firstName ?? 'Anonymous',
+              lastName: post.user.lastName ?? '',
+            };
 
             return (
-              <Card key={post.id} className="shadow-md">
-                {/* Header with User Info */}
+             <Card key={`${post.id}-${index}`} className="shadow-md">
                 <CardHeader className="flex flex-row items-start gap-3">
                   <Avatar>
-                    <AvatarFallback>
-                      {firstName[0] ?? post.user.email[0].toUpperCase()}
-                    </AvatarFallback>
+                    <AvatarFallback>{safeUser.email[0]?.toUpperCase()}</AvatarFallback>
                   </Avatar>
-
                   <div className="flex flex-col">
-                    <p className="text-sm font-semibold">{firstName} {lastName}</p>
+                    <p className="text-sm font-semibold">{renderUser(safeUser)}</p>
                     <p className="text-xs text-muted-foreground">
                       {post.time ?? new Date(post.createdAt).toLocaleDateString()}
                     </p>
@@ -430,20 +380,33 @@ export default function FeedPage() {
                   </div>
                 </CardHeader>
 
-                {/* Image Carousel */}
                 {post.images?.length ? (
                   <div className="relative w-full h-[300px]">
                     <Image
-                      src={post.images[activeIndices[post.id]]}
-                      alt={`Post image ${activeIndices[post.id]}`}
+                      src={post.images[activeIndex]}
+                      alt="Post image"
                       fill
+                      loading="eager"
                       className="object-cover"
-                      onClick={() => toast.info(`Viewing image ${activeIndices[post.id] + 1} of ${post.images?.length}`)}
                     />
+                    {post.images.length > 1 && (
+                      <div className="absolute inset-0 flex items-center justify-between px-2">
+                        <Button size="sm" variant="secondary" onClick={() => prevImage(post.id)} disabled={activeIndex === 0}>
+                          ‹
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={() => nextImage(post.id, post.images!.length)}
+                          disabled={activeIndex === post.images.length - 1}
+                        >
+                          ›
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 ) : null}
 
-                {/* Actions like Like, Comment, Share */}
                 <CardFooter className="flex justify-around border-t">
                   <Button variant="ghost" size="sm">
                     <Heart className="h-4 w-4 mr-1" /> Like
@@ -458,8 +421,12 @@ export default function FeedPage() {
               </Card>
             );
           })}
-        </div>
-      </InfiniteScroll>
+        </InfiniteScroll>
+      </div>
     </>
   );
 }
+
+
+
+

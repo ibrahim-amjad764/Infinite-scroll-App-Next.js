@@ -3,8 +3,10 @@ import { initDB } from "@/src/db/init-db";
 import { AppDataSource } from "@/src/db/data-source";
 import { User } from "@/src/entities/user";
 import admin from "@/src/lib/firebase-admin";
+
 // POST
 export async function POST(req: Request) {
+  
   try {
     console.log("Login API Hit");
 
@@ -30,10 +32,17 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "User not found in DB" }, { status: 404 });
     }
     console.log("Returning DB user:", user.email);
-// ✅ create response
-    const response = NextResponse.json(user);
+    // create SAFE user object (plain JSON)
+const safeUser = {
+  id: user.id,
+  email: user.email,
+};
+
+const response = NextResponse.json(safeUser);
+// create response
+    // const response = NextResponse.json(user);
     
-    // ✅ set cookie on response
+    // set cookie on response
     response.cookies.set("auth-token", token, {
       httpOnly: true, // JS/browser se access nahi → secure
       sameSite: "lax",  // CSRF attacks se bachao (Lax is safe for normal logins)

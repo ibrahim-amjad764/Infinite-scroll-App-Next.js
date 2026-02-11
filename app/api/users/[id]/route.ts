@@ -15,7 +15,7 @@ export async function GET(
     const userId = Number(id);
 
     const repo = AppDataSource.getRepository(User);
-    const user = await repo.findOneBy({ id: userId });
+    const user = await repo.findOneBy({ id: userId.toString() });
 
     if (!user) {
       return Response.json({ message: "User not found" }, { status: 404 });
@@ -44,7 +44,7 @@ export async function PATCH(
 
     const repo = AppDataSource.getRepository(User);
 
-    const user = await repo.findOneBy({ id: userId }); 
+    const user = await repo.findOneBy({ id: userId.toString() }); 
     if (!user) {
       return Response.json({ message: "User not found" }, { status: 404 });
     }
@@ -72,7 +72,7 @@ export async function DELETE(
 
     const repo = AppDataSource.getRepository(User);
 
-    const user = await repo.findOneBy({ id: userId });
+    const user = await repo.findOneBy({ id: userId.toString() });
     if (!user) {
       return Response.json({ message: "User not found" }, { status: 404 });
     }

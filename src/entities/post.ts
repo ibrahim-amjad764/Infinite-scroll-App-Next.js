@@ -1,33 +1,3 @@
-// import {
-//   Entity,
-//   PrimaryGeneratedColumn,
-//   Column,
-//   CreateDateColumn,
-//   ManyToOne,
-// } from "typeorm";
-// import { User } from "./user";  // Keep the import of User
-
-// @Entity("posts")
-// export class Post {
-//   @PrimaryGeneratedColumn("uuid")
-//   id!: string;
-
-//   @Column("text")
-//   content!: string;
-
-//   @Column("text", { array: true, nullable: true })
-//   images?: string[];
-
-//   @ManyToOne(() => User, (user) => user.posts, {
-//     onDelete: "CASCADE",
-//   })
-//   user!: User;
-
-//   @CreateDateColumn()
-//   createdAt!: Date;
-// }
-
-
 // src/entities/post.ts
  
 import {

@@ -92,10 +92,10 @@ export async function signIn(email: string, password: string) {
 const auth = getAuth(app)
 export const logout = async () => {
   try {
-    // 1️⃣ Sign out from Firebase client
+    //  Sign out from Firebase client
     await signOut(auth)
 
-    // 2️⃣ Call server API to delete cookie
+    //  Call server API to delete cookie
     await fetch("/api/auth/logout", {
       method: "POST",
       credentials: "include", // important so cookie is sent

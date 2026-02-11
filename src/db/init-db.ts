@@ -9,7 +9,6 @@ export async function initDB() {
 // Import the renamed function to avoid conflicts
 import { initDB as initializeDatabase } from "@/src/db/init-db";  // Renamed import
 
-
 // Initialize the database if it's not already initialized
 await initializeDatabase();
 

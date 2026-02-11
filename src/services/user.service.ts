@@ -19,7 +19,7 @@ export const createUser = async (
 // UPDATE
 export const updateUser = async (
   id: number,               
-  payload: Partial<UserDTO>        // Only fields that need change
+  payload: Partial<UserDTO>// Only fields that need change
 ): Promise<UserDTO> => {
   const res = await api.patch<UserDTO>(`/users/${id}`, payload);
 

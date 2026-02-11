@@ -1,5 +1,4 @@
 // type/renderUser.ts
-
 export interface UserType {
   id: string;
   firstName: string;

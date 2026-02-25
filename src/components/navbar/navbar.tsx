@@ -134,17 +134,18 @@
 //     return <SearchBar />
 // }
 
+
 "use client"
 
 import { useEffect, useState, KeyboardEvent } from "react"
 import Link from "next/link"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import LogoutButton from "@/src/components/membership/logout-page-03/logout-form"
+import { Avatar, AvatarFallback, AvatarImage } from "../../../components/ui/avatar"
+import { Button } from "../../../components/ui/button"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../../components/ui/dropdown-menu"
+import LogoutButton from "@/components/membership/logout-page-03/logout-form"
 import { Plus, Moon, Sun } from "lucide-react"
 import { FiSearch } from "react-icons/fi"
-import { CreatePostModal } from "@/src/components/posts/CreatePostModal";  // Import the modal component
+import { CreatePostModal } from "@/components/posts/CreatePostModal";  // Import the modal component
 
 export function Navbar() {
   const [dark, setDark] = useState(false)

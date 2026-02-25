@@ -1,6 +1,6 @@
 // app/api/upload/route.ts
 import { NextResponse } from "next/server";
-import cloudinary from "@/src/lib/cloudinary"; // your server-side Cloudinary SDK
+import cloudinary from "@/lib/cloudinary"; // your server-side Cloudinary SDK
 
 export async function POST(req: Request) {
   const formData = await req.formData();
@@ -12,12 +12,12 @@ export async function POST(req: Request) {
   }
 
   if (files.length > 6) {
-     console.log("Too many images uploaded");
+    console.log("Too many images uploaded");
     return NextResponse.json({ error: "Max 6 images allowed" }, { status: 400 });
   }
 
   try {
-    
+
     // Convert each File/Blob to a buffer and upload via stream
     const uploadPromises = files.map(async (file: any) => {
       //buffer handle binary data
@@ -39,10 +39,8 @@ export async function POST(req: Request) {
             }
           }
         );
-
         stream.end(buffer); // send buffer to Cloudinary
       });
-
       return result.secure_url; // return the uploaded image URL
     });
 

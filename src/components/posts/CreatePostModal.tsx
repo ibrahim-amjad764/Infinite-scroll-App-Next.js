@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+import { useEffect ,useState, useRef } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle  } from "../../../components/ui/dialog";
+import { Button } from "../../../components/ui/button";
+import { Textarea } from "../../../components/ui/textarea";
 import Image from "next/image";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
@@ -16,6 +16,7 @@ interface Props {
 }
 
 export function CreatePostModal({ open, onClose, onSuccess }: Props) {
+  
   const [content, setContent] = useState("");
   const [images, setImages] = useState<string[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -100,43 +101,91 @@ export function CreatePostModal({ open, onClose, onSuccess }: Props) {
     }
   };
 
+  // const handleSubmit = async () => {
+  //   if (!content.trim()) {
+  //     toast.error("Post content is required");
+  //     return;
+  //   }
+
+  //   setLoading(true);
+
+  //   try {
+  //     const res = await fetch("/api/posts", {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({ content, images }),
+  //     });
+
+  //     const data = await res.json();
+
+  //     if (!res.ok) {
+  //       toast.error(data?.error || "Something went wrong");
+  //       return;
+  //     }
+
+  //     toast.success("Post created successfully!");
+  //     queryClient.invalidateQueries({ queryKey: ["posts"] });
+
+  //     setContent("");
+  //     setImages([]);
+  //     setActiveIndex(0);
+  //     onClose();
+  //     if (onSuccess) onSuccess();
+  //   } catch (err: any) {
+  //     console.error(err);
+  //     toast.error(err?.message || "Something went wrong");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   const handleSubmit = async () => {
-    if (!content.trim()) {
-      toast.error("Post content is required");
+  if (!content.trim()) {
+    toast.error("Post content is required");
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    const res = await fetch("/api/posts", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ content, images }),
+    });
+
+    console.log("Response status:", res.status);
+    const text = await res.text();
+    console.log("Raw response text:", text);
+
+    let data;
+    try {
+      data = text ? JSON.parse(text) : {};
+    } catch (err) {
+      console.error("JSON parse error:", err);
+      data = {};
+    }
+
+    if (!res.ok) {
+      toast.error(data?.error || "Something went wrong");
       return;
     }
 
-    setLoading(true);
+    toast.success("Post created successfully!");
+    queryClient.invalidateQueries({ queryKey: ["posts"] });
 
-    try {
-      const res = await fetch("/api/posts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content, images }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        toast.error(data?.error || "Something went wrong");
-        return;
-      }
-
-      toast.success("Post created successfully!");
-      queryClient.invalidateQueries({ queryKey: ["posts"] });
-
-      setContent("");
-      setImages([]);
-      setActiveIndex(0);
-      onClose();
-      if (onSuccess) onSuccess();
-    } catch (err: any) {
-      console.error(err);
-      toast.error(err?.message || "Something went wrong");
-    } finally {
-      setLoading(false);
-    }
-  };
+    setContent("");
+    setImages([]);
+    setActiveIndex(0);
+    onClose();
+    if (onSuccess) onSuccess();
+  } catch (err: any) {
+    console.error(err);
+    toast.error(err?.message || "Something went wrong");
+  } finally {
+    setLoading(false);
+  }
+};
 
   const nextImage = () => {
     if (activeIndex < sanitizedImages.length - 1) setActiveIndex(activeIndex + 1);
@@ -149,100 +198,109 @@ export function CreatePostModal({ open, onClose, onSuccess }: Props) {
   // Render
 
   return (
-    <Dialog isOpen={open} onClose={onClose}>
-      <DialogContent className="max-w-lg">
-        <DialogHeader>
-          <DialogTitle>Create Post</DialogTitle>
-        </DialogHeader>
+  <Dialog isOpen={open} onClose={onClose}> 
+    <DialogContent className="max-w-lg bg-gray-300 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 shadow-xl rounded-xl">
+      
+      <DialogHeader>
+  <DialogTitle>
+    <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
+      Create Post
+    </h2>
+  </DialogTitle>
+</DialogHeader>
 
-        <Textarea
-          placeholder="What's on your mind?"
-          value={content}
-          onChange={handleChange}
-          rows={4}
-        />
 
-        <input
-          type="file"
-          accept="image/*"
-          multiple
-          hidden
-          ref={fileRef}
-          onChange={(e) => handleFiles(e.target.files)}
-        />
+      <Textarea
+        placeholder="What's on your mind?"
+        value={content}
+        onChange={handleChange}
+        rows={4}
+        className="bg-gray-200 dark:bg-zinc-700 border border-zinc-300 dark:border-zinc-700 focus-visible:ring-2 focus-visible:ring-blue-500 text-zinc-850 dark:text-zinc-100 placeholder:text-zinc-500 dark:placeholder:text-zinc-400 "/>
 
-        {/* Image Carousel */}
-        {sanitizedImages.length > 0 && (
-          <div className="flex justify-center items-center mt-2">
-            <Button variant="secondary" onClick={prevImage} disabled={activeIndex === 0} className="mr-2">
-              &lt;
-            </Button>
+      <input
+        type="file"
+        accept="image/*"
+        multiple
+        hidden
+        ref={fileRef}
+        onChange={(e) => handleFiles(e.target.files)}/>
 
-            <div className="relative w-64 h-64">
-              <Image
-                src={sanitizedImages[activeIndex]}
-                alt={`Post image ${activeIndex + 1}`}
-                fill
-                className="object-cover"
-              />
-            </div>
+      {/* Image Carousel */}
+      {sanitizedImages.length > 0 && (
+        <div className="flex justify-center items-center mt-4">
+          <Button
+            variant="secondary"
+            onClick={prevImage}
+            disabled={activeIndex === 0}
+            className="mr-2 dark:bg-zinc-800 dark:hover:bg-zinc-700">
+            &lt;
+          </Button>
 
-            <Button
-              variant="secondary"
-              onClick={nextImage}
-              disabled={activeIndex === sanitizedImages.length - 1}
-              className="ml-2"
-            >
-              &gt;
-            </Button>
-          </div>
-        )}
-
-        {/* Thumbnails with advanced loading */}
-        <div className="flex gap-2 flex-wrap mt-2">
-          {/* Uploaded images */}
-          {images.map((img, i) => (
+          <div className="relative w-64 h-64 rounded-lg overflow-hidden border border-zinc-300 dark:border-zinc-700">
             <Image
-              key={i}
-              src={img}
-              alt={`Post image ${i + 1}`}
-              width={80}
-              height={80}
-              className="rounded object-cover"
-            />
-          ))}
+              src={sanitizedImages[activeIndex]}
+              alt={`Post image ${activeIndex + 1}`}
+              fill
+              className="object-cover" />
+          </div>
 
-          {/* Uploading images */}
-          {uploadingImages.map((img, i) => (
+          <Button
+            variant="secondary"
+            onClick={nextImage}
+            disabled={activeIndex === sanitizedImages.length - 1}
+            className="ml-2 dark:bg-zinc-800 dark:hover:bg-zinc-700 ">
+            &gt;
+          </Button>
+        </div>
+      )}
+
+      {/* Thumbnails */}
+      <div className="flex gap-2 flex-wrap mt-4">
+        {images.map((img, i) => (
+          <Image
+            key={i}
+            src={img}
+            alt={`Post image ${i + 1}`}
+            width={80}
+            height={80}
+            className="rounded-md object-cover border border-zinc-300 dark:border-zinc-700"/>
+        ))}
+
+        {uploadingImages.map((img, i) => (
+          <div
+            key={i}
+            className="relative w-20 h-20 rounded-md overflow-hidden bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center" >
+            <img
+              src={URL.createObjectURL(img.file)}
+              alt="Uploading"
+              className="w-full h-full object-cover blur-sm" />
             <div
-              key={i}
-              className="relative w-20 h-20 rounded overflow-hidden bg-gray-200 animate-pulse flex items-center justify-center"
-            >
-              <img
-                src={URL.createObjectURL(img.file)}
-                alt="Uploading"
-                className="w-full h-full object-cover blur-sm"
-              />
-              <div
-                className="absolute bottom-0 left-0 h-1 bg-blue-500 transition-all"
-                style={{ width: `${img.progress}%` }}
-              ></div>
-              <span className="absolute inset-0 flex items-center justify-center text-xs text-white font-bold">
-                {img.progress}%
-              </span>
-            </div>
-          ))}
-        </div>
+              className="absolute bottom-0 left-0 h-1 bg-blue-500 transition-all"
+              style={{ width: `${img.progress}%` }}/>
+            <span className="absolute inset-0 flex items-center justify-center text-xs text-white font-bold">
+              {img.progress}%
+            </span>
+          </div>
+        ))}
+      </div>
 
-        <div className="flex justify-between mt-4">
-          <Button variant="secondary" onClick={() => fileRef.current?.click()}>
-            Add Image
-          </Button>
-          <Button onClick={handleSubmit} disabled={loading}>
-            {loading ? "Posting..." : "Post"}
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
+      {/* Buttons */}
+      <div className="flex justify-between mt-6">
+        <Button
+          variant="secondary"
+          onClick={() => fileRef.current?.click()}
+          className= " dark:bg-green-900 dark:hover:bg-slate-700 transition-all duration-200 ease-in-out hover:scale-105 active:scale-95">
+          Add Image
+        </Button>
+
+        <Button
+          onClick={handleSubmit}
+          disabled={loading}
+          className="bg-blue-600 hover:bg-blue-500 text-white transition-all duration-200 ease-in-out hover:scale-105 active:scale-95" >
+          {loading ? "Posting..." : "Post"}
+        </Button>
+      </div>
+    </DialogContent>
+  </Dialog>
+);
 }

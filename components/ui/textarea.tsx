@@ -1,6 +1,6 @@
 // /components/ui/textarea.tsx
 import * as React from "react"
-import { cn } from "@/src/lib/utils"  // Utility function for conditional classes
+import { cn } from "@/lib/utils"  // Utility function for conditional classes
 
 const Textarea = React.forwardRef<HTMLTextAreaElement, React.ComponentProps<"textarea">>(
   ({ className, ...props }, ref) => {

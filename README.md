@@ -69,20 +69,151 @@ This project demonstrates **real-world auth patterns**, **secure session handlin
 ---
 
 ## 📁 Project Structure
-
-```txt
-src/
-├─ app/
-│  ├─ auth/            # Login / Signup pages
-│  ├─ feed/            # Protected feed page
-│  ├─ api/             # Backend API routes
-│  └─ middleware.ts    # Edge middleware
+NEXT-TYPEORM-POSTGRES/
 │
-├─ components/         # UI components
-├─ entities/           # TypeORM entities
-├─ lib/                # Firebase, Axios, utils
-├─ services/           # Auth & API services
-└─ types/              # Shared DTOs
+├── .next/
+├── node_modules/
+├── dist/
+├── public/
+├── path/
+│
+├── .env.local
+├── .gitignore
+├── README.md
+├── components.json
+├── eslint.config.mjs
+├── middleware.ts
+├── next-env.d.ts
+├── next.config.ts
+├── package.json
+├── package-lock.json
+├── postcss.config.mjs
+├── tailwind.config.js
+├── server.js
+├── runMigration.ts
+├── tsconfig.json
+├── tsconfig.cli.json
+├── tsconfig.tsbuildinfo
+│
+├── app/
+│   ├── api/
+│   │   ├── auth/
+│   │   │   ├── login/
+│   │   │   │   └── route.ts
+│   │   │   ├── logout/
+│   │   │   │   └── route.ts
+│   │   │   ├── refresh/
+│   │   │   │   └── route.ts
+│   │   │   └── signup/
+│   │   │       └── route.ts
+│   │   │
+│   │   ├── posts/
+│   │   │   ├── comment/
+│   │   │   │   └── route.ts
+│   │   │   ├── like/
+│   │   │   │   └── route.ts
+│   │   │   └── route.ts
+│   │   │
+│   │   ├── profile-user/
+│   │   │   └── route.ts
+│   │   │
+│   │   ├── upload/
+│   │   │   └── route.ts
+│   │   │
+│   │   └── users/
+│   │       └── [id]/
+│   │           └── route.ts
+│   │
+│   ├── assets/
+│   │   └── svg/
+│   │
+│   ├── auth/
+│   │   ├── forgot-password/
+│   │   │   └── page.tsx
+│   │   ├── login/
+│   │   │   └── page.tsx
+│   │   └── sign-up/
+│   │       └── page.tsx
+│   │
+│   ├── feed/
+│   │   └── page.tsx
+│   │
+│   ├── profile/
+│   │   ├── edit/
+│   │   │   └── page.tsx
+│   │   └── page.tsx
+│   │
+│   ├── favicon.ico
+│   ├── globals.css
+│   ├── layout.tsx
+│   └── page.tsx
+│
+├── components/
+│
+├── src/
+│   │
+│   ├── components/
+│   │   ├── comments/
+│   │   │   └── CommentSection.tsx
+│   │   ├── logo/
+│   │   ├── membership/
+│   │   ├── forget-page/
+│   │   │   └── forgot-password-form.tsx
+│   │   ├── login-page-02/
+│   │   │   ├── login-page-01 .tsx
+│   │   │   └── login-form.tsx
+│   │   ├── logout-page-03/
+│   │   │   └── logout-form.tsx
+│   │   ├── profile-page/
+│   │   │   ├── EditProfileForm.tsx
+│   │   │   ├── ProfileCard.tsx
+│   │   │   ├── ProfileContent.tsx
+│   │   │   └── ProfileHeader.tsx
+│   │   ├── signup-page-01/
+│   │   │   ├── signup-form.tsx
+│   │   │   └── signup-page.tsx
+│   │   ├── navbar/
+│   │   │   └── navbar.tsx
+│   │   ├── posts/
+│   │   │   └── CreatePostModal.tsx
+│   │   └── ui/
+│   │
+│   ├── db/
+│   │   ├── data-source.ts
+│   │   ├── init-db.ts
+│   │   └── hostDataSource.ts
+│   │
+│   ├── entities/
+│   │   ├── comment.ts
+│   │   ├── like.ts
+│   │   ├── post.ts
+│   │   └── user.ts
+│   │
+│   ├── lib/
+│   │   ├── api.ts
+│   │   ├── cloudinary.ts
+│   │   ├── firebase.ts
+│   │   ├── firebase-admin.ts
+│   │   ├── utils.ts
+│   │   └── websocket.ts
+│   │
+│   ├── migrations/
+│   │
+│   ├── providers/
+│   │   └── ReactQueryProvider.tsx
+│   │
+│   ├── services/
+│   │   ├── auth.service.ts
+│   │   └── user.service.ts
+│   │
+│   ├── store/
+│   │   └── useStore.ts
+│   │
+│   └── types/
+│       ├── post.ts
+│       ├── renderUser.ts
+│       └── users.ts
+
 ```
 
 ---

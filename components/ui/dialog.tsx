@@ -113,7 +113,7 @@
 // export { Dialog, DialogContent, DialogHeader, DialogTitle }
 
 import * as React from "react";
-import { cn } from "@/src/lib/utils"; // Utility function for conditional classes
+import { cn } from "@/lib/utils"; // Utility function for conditional classes
 
 // DialogProps to accept children and onClose callback
 interface DialogProps {
@@ -127,12 +127,12 @@ const Dialog: React.FC<DialogProps> = ({ isOpen, onClose, children }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="relative w-full max-w-lg p-6 bg-white rounded-lg shadow-lg">
+      <div className="relative w-full max-w-lg p-6 bg-gray rounded-lg shadow-lg">
         <button
-          className="absolute top-2 right-2 text-xl font-bold"
+          className="absolute -top-2 right-2 text-xl font-bold dark:text-white text-white"
           onClick={onClose} // Close the modal
         >
-          ×
+          X
         </button>
         {children} {/* Render children passed to Dialog */}
       </div>

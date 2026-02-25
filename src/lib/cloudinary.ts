@@ -37,3 +37,4 @@ export async function POST(req: Request) {
   return new Response(JSON.stringify({ url: result.secure_url }));
 }
 export default cloudinary;  // Purpose: Reusable Cloudinary client
+

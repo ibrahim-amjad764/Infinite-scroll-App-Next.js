@@ -1,64 +1,25 @@
 // "use client";
 
-// import { useState } from "react";
-// import { useQuery } from "@tanstack/react-query";
-// import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
-// import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-// import { Button } from "@/components/ui/button";
-// import { Heart, MessageCircle, Share2 } from "lucide-react";
-// import { Navbar } from "@/src/components/navbar/navbar";
+// import React, { useState, useEffect, useRef } from "react";
 // import Image from "next/image";
-// import { renderUser } from "@/src/types/renderUser";
+// import Link from "next/link";
+// import InfiniteScroll from "react-infinite-scroll-component";
+// import { useQuery } from "@tanstack/react-query";
+// import { Heart, MessageCircle, Share2, Moon } from "lucide-react";
+// import { Card, CardContent, CardFooter, CardHeader } from "../../components/ui/card";
+// import { Avatar, AvatarFallback } from "../../components/ui/avatar";
+// import { Button } from "../../components/ui/button";
+// import { SidebarProvider } from "../../components/ui/sidebar";
+// import ThemeDropdown from "../../components/ui/dropdown-theme";
+// import ProfileDropdown from "../../components/ui/dropdown-profile";
+// import { SkeletonLoader } from "../../components/ui/SkeletonLoader";
+// import { renderUser } from "../../src/types/renderUser";
+// import { Loader2 } from "lucide-react";
+// import { CreatePostModal } from "../../src/components/posts/CreatePostModal";
+// import { toast } from "sonner";
+// import { auth } from "@/lib/firebase"; 
+// import { getFirebaseToken, authFetch } from "@/services/auth.service"; 
 
-
-// // const posts = [
-// //   {
-// //     id: 1,
-// //     user: "shadcn",
-// //     time: "5h",
-// //     // avatar: "https://github.com/evilrabbit.png",
-// //     content: "A modern authentication system built with Firebase, focusing on security, performance, and clean UI.",
-// //     image: "https://images.unsplash.com/photo-1526779259212-939e64788e3c?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8ZnJlZSUyMGltYWdlc3xlbnwwfHwwfHx8MA%3D%3D",
-// //   },
-
-// //   {
-// //     id: 2,
-// //     user: "evilrabbit",
-// //     time: "6d",
-// //     // avatar: "https://github.com/evilrabbit.png",
-// //     content: "This project demonstrates Firebase Authentication with a sleek, production-ready interface.",
-// //     image: null,
-// //   },
-// //   {
-// //     id: 3,
-// //     user: "yyx990803",
-// //     time: "7h",
-// //     // avatar: "https://github.com/evilrabbit.png",
-// //     content: "A modern authentication system built with Firebase, focusing on security, performance, and clean UI.",
-// //     image: "https://images.unsplash.com/photo-1768463852001-811ead5844fb?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwxNTB8fHxlbnwwfHx8fHw%3D",
-// //   },
-// //   {
-// //     id: 4,
-// //     user: "torvalds",
-// //     time: "2h",
-// //     // avatar: "https://github.com/evilrabbit.png",
-// //     content: "Secure user authentication using Firebase with a modern React & Next.js stack.",
-// //     image: "https://images.unsplash.com/photo-1702416197021-b24131ab8232?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZnJlZSUyMGltYWdlcyUyMGNhcnN8ZW58MHx8MHx8fDA%3D",
-// //   },
-// //   {
-// //     id: 5,
-// //     user: "gaearon",
-// //     time: "10d",
-// //     // avatar: "https://github.com/evilrabbit.png",
-// //     content: "A modern authentication system built with Firebase, focusing on security, performance, and clean UI.",
-// //     image: "https://plus.unsplash.com/premium_photo-1763073253332-e75e796e8925?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwxNDV8fHxlbnwwfHx8fHw%3Dhttps://images.unsplash.com/photo-1768895415845-f3e6ff701a0b?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwxMDd8fHxlbnwwfHx8fHw%3Dhttps://images.unsplash.com/photo-1702416197021-b24131ab8232?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZnJlZSUyMGltYWdlcyUyMGNhcnN8ZW58MHx8MHx8fDA%3D",
-// //   },
-// // ]
-
-//   //   <Card key={post.id}>...</Card>
-//   // ))}
-
-//   //User Type
 // interface User {
 //   id: string;
 //   firstName?: string | null;
@@ -66,184 +27,355 @@
 //   email: string;
 // }
 
-// //Post Type
 // interface Post {
 //   id: string;
 //   content: string;
-//   images?: string[]; //  undefined
+//   images?: string[];
 //   createdAt: string;
 //   user: User;
 //   time?: string;
 // }
 
-// const fetchPosts = async (): Promise<Post[]> => {
-//   const res = await fetch("/api/posts");
+// interface FetchPostsResponse {
+//   posts: Post[];
+//   hasMore: boolean;
+// }
 
-//   if (!res.ok) {
-//     throw new Error("Failed to fetch posts");
-//   }
+// // Fetch posts from API (uses authFetch to auto-refresh token on 401)
+// const fetchPosts = async (page: number): Promise<FetchPostsResponse> => {
+//   const res = await authFetch(`/api/posts?page=${page}&limit=5`);
+//   if (!res.ok) throw new Error("Failed to fetch posts");
 //   const data = await res.json();
-//   // Check if the data is an array, otherwise return an empty array
-//   if (Array.isArray(data)) {
-//     return data;
-//   } else if (data && Array.isArray(data.posts)) {
-//     return data.posts; // Assuming posts are inside a 'posts' key
-//   } else {
-//     console.error("Unexpected response structure:", data);
-//     return []; // Return an empty array if the structure is unexpected
-//   }
+//   if (Array.isArray(data)) return { posts: data, hasMore: true };
+//   return { posts: data.posts || [], hasMore: data.hasMore || false };
 // };
 
 // export default function FeedPage() {
-//   const { data: posts = [], isLoading, error } = useQuery<Post[]>({
-//     queryKey: ["posts"],//unique identifier
-//     queryFn: fetchPosts,
+//   const [page, setPage] = useState(1);
+//   const [allPosts, setAllPosts] = useState<Post[]>([]);
+//   const [hasMore, setHasMore] = useState(true);
+//   const [activeIndices, setActiveIndices] = useState<Record<string, number>>({});
+//   const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set());
+//   const [delayedLoading, setDelayedLoading] = useState(true);
+//   const [openPost, setOpenPost] = useState(false);
+
+
+
+//   const { data, isLoading, isError } = useQuery<FetchPostsResponse>({
+//     queryKey: ["posts", page],
+//     queryFn: () => fetchPosts(page),
 //     retry: 2,
+//     placeholderData: (prev) => prev,
 //   });
-//   if (!Array.isArray(posts)) {
-//   console.error("Expected posts to be an array, but got:", posts);
-//   return <p>Something went wrong.</p>;
-// }
 
-//   // Manage active index for each post outside of .map()
-//   const [activeIndices, setActiveIndices] = useState<{ [key: string]: number }>({});
+//   // Update posts when data changes
+//   useEffect(() => {
+//     if (!data?.posts) return;
+//     setHasMore(data.hasMore);
+//     setAllPosts((prev) => (page === 1 ? data.posts : [...prev, ...data.posts]));
+//   }, [data, page]);
 
-//   const handleNextImage = (postId: string, imagesLength: number) => {
-//     setActiveIndices((prev) => ({
-//       ...prev,
-//       [postId]: Math.min(prev[postId] + 1, imagesLength - 1),
-//     }));
+//   // Simulate loading delay
+//   useEffect(() => {
+//     if (!isLoading && !isError) {
+//       const timer = setTimeout(() => setDelayedLoading(false), 1000);
+//       return () => clearTimeout(timer);
+//     }
+//   }, [isLoading, isError]);
+
+//   // Image carousel handlers
+//   const nextImage = (postId: string, length: number) =>
+//     setActiveIndices((prev) => ({ ...prev, [postId]: Math.min((prev[postId] ?? 0) + 1, length - 1) }));
+//   const prevImage = (postId: string) =>
+//     setActiveIndices((prev) => ({ ...prev, [postId]: Math.max((prev[postId] ?? 0) - 1, 0) }));
+
+//   // Load more posts on scroll
+//   const loadMorePosts = () => {
+//     if (hasMore) setPage((prev) => prev + 1);
 //   };
 
-//   const handlePrevImage = (postId: string) => {
-//     setActiveIndices((prev) => ({
-//       ...prev,
-//       [postId]: Math.max((prev[postId] || 0) - 1, 0),
-//     }));
-//   };
+//   // Handle like functionality
+// // Handle the like functionality for a post
+// const handleLike = async (postId: string) => {
+//   try {
+//     const user = auth.currentUser;
+//     if (!user) {
+//       // Check if user is logged in
+//       alert("You need to be logged in to like posts.");
+//       return;
+//     }
 
-//   //   <Card key={post.id}>...</Card>
-//   // ))}
+//     const token = await user.getIdToken(true); // Get the fresh Firebase token
 
-//   if (isLoading) return <p>Loading posts...</p>;
-//   if (error) return <p>Something went wrong.</p>;
-//   if (posts.length === 0) return <p>No posts yet.</p>;
+//     // Send a POST request to like the post
+//     const response = await fetch("/api/posts/like", {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json",
+//         Authorization: `Bearer ${token}`, // Include the token for authentication
+//       },
+//       body: JSON.stringify({ postId }), // Send the postId to identify which post to like
+//     });
+
+//     if (response.ok) {
+//       setLikedPosts((prev) => new Set(prev).add(postId)); // Update liked posts in the state
+//       console.log(`Post ${postId} liked successfully.`);
+//     } else {
+//       // Handle errors from the API
+//       const error = await response.json();
+//       toast(error.message || "Error liking post");
+//     }
+//   } catch (error) {
+//     console.error("Error liking the post:", error);
+//     toast("Something went wrong. Please try again.");
+//   }
+// };
+
+//   const posts = allPosts;
+
+//   const mainContent = isLoading || delayedLoading ? (
+//     <SkeletonLoader />
+//   ) : isError ? (
+//     <p className="text-center py-10">Something went wrong.</p>
+//   ) : posts.length === 0 ? (
+//     <p className="text-center py-10">No posts yet.</p>
+//   ) : (
+//     <InfiniteScroll
+//       dataLength={posts.length}
+//       next={loadMorePosts}
+//       hasMore={hasMore}
+//       scrollThreshold={0.9}
+//       loader={
+//         <div className="flex justify-center my-4">
+//           <Loader2 className="h-8 w-8 animate-spin" />
+//         </div>
+//       }
+//       endMessage={<p className="flex justify-center py-4">No more posts to show</p>}
+//     >
+//       {posts.map((post, index) => {
+//         const activeIndex = activeIndices[post.id] ?? 0;
+//         const safeUser = {
+//           ...post.user,
+//           firstName: post.user.firstName ?? "Anonymous",
+//           lastName: post.user.lastName ?? "",
+//         };
+//         const isLiked = likedPosts.has(post.id);
+
+//         return (
+//           <Card key={post.id + "-" + index} className="shadow-md mb-6">
+//             <CardHeader className="flex flex-row items-start gap-3">
+//               <Avatar>
+//                 <AvatarFallback>{safeUser.email[0]?.toUpperCase()}</AvatarFallback>
+//               </Avatar>
+//               <div className="flex flex-col">
+//                 <p className="text-sm font-semibold">{renderUser(safeUser)}</p>
+//                 <p className="text-xs text-muted-foreground">
+//                   {post.time ?? new Date(post.createdAt).toLocaleDateString()}
+//                 </p>
+//                 <CardContent className="text-sm p-0 mt-1">{post.content}</CardContent>
+//               </div>
+//             </CardHeader>
+
+//             {post.images?.length ? (
+//               <div className="relative w-full h-[300px]">
+//                 <Image
+//                   src={post.images[activeIndex]}
+//                   alt="Post image"
+//                   fill
+//                   className="object-cover"
+//                   loading="eager"
+//                 />
+//                 {post.images.length > 1 && (
+//                   <div className="absolute inset-0 flex items-center justify-between px-2">
+//                     <Button size="sm" variant="secondary" onClick={() => prevImage(post.id)} disabled={activeIndex === 0}>
+//                       ‹
+//                     </Button>
+//                     <Button
+//                       size="sm"
+//                       variant="secondary"
+//                       onClick={() => nextImage(post.id, post.images!.length)}
+//                       disabled={activeIndex === post.images.length - 1}
+//                     >
+//                       ›
+//                     </Button>
+//                   </div>
+//                 )}
+//               </div>
+//             ) : null}
+
+//             <CardFooter className="flex justify-around border-t">
+//               <Button
+//                 variant="ghost"
+//                 size="sm"
+//                 onClick={() => handleLike(post.id)}
+//                 disabled={isLiked}
+//               >
+//                 <Heart className="h-4 w-4 mr-1" />
+//                 {isLiked ? "Liked" : "Like"}
+//               </Button>
+//               <Button variant="ghost" size="sm">
+//                 <MessageCircle className="h-4 w-4 mr-1" /> Comment
+//               </Button>
+//               <Button variant="ghost" size="sm">
+//                 <Share2 className="h-4 w-4 mr-1" /> Share
+//               </Button>
+//             </CardFooter>
+//           </Card>
+//         );
+//       })}
+//     </InfiniteScroll>
+//   );
 
 //   return (
-//     <>
-//       <Navbar />
+//     <SidebarProvider>
+//       <div className="flex min-h-dvh w-full flex-col">
+//         <header className="bg-card sticky top-0 z-50 border-b">
+//           <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-4 py-2 sm:px-6">
+//             <Link href="/feed" className="flex items-center gap-2">
+//               <div className="w-[50px] h-[50px] rounded-full overflow-hidden">
+//                 <Image src="/logo.png" alt="Logo" width={50} height={50} className="object-cover w-full h-full scale-150" />
+//               </div>
+//               <span className="lg:text-lg font-extrabold text-black italic tracking-wider animate-pulse">Zentia</span>
+//             </Link>
 
-//       <div className="mx-auto max-w-xl flex flex-col gap-6 py-6">
-//         {posts.map((post) => {
-//           const safeUser = {
-//             ...post.user,
-//             firstName: post.user.firstName ?? "Anonymous",
-//             lastName: post.user.lastName ?? "",
-//           };
-//           const displayName =
-//             post.user.firstName || post.user.lastName
-//               ? `${post.user.firstName ?? ""} ${post.user.lastName ?? ""}`.trim()
-//               : "Anonymous User";
+//             <div className="flex items-center gap-1.5">
+//               <ThemeDropdown trigger={<Button variant="ghost" size="icon"><Moon className="size-8" /></Button>} />
+//               <Button size="sm" variant="secondary" onClick={() => setOpenPost(true)} className="transition-all duration-200 ease-in-out hover:scale-105 active:scale-95">
+//                 New Post
+//               </Button>
+//               <ProfileDropdown trigger={<Button variant="ghost" size="icon"><Avatar><AvatarFallback>U</AvatarFallback></Avatar></Button>} />
+//             </div>
+//           </div>
+//         </header>
 
-//           // Set the activeIndex for the current post, if not set
-//           if (activeIndices[post.id] === undefined) {
-//             setActiveIndices((prev) => ({
-//               ...prev,
-//               [post.id]: 0, // Initialize the first image as the active one
-//             }));
-//           }
-
-//           return (
-//             <Card key={post.id} className="shadow-md">
-//               {/* header */}
-//               <CardHeader className="flex flex-row items-start gap-3">
-//                 <Avatar>
-//                   <AvatarFallback>
-//                     {post.user.firstName?.[0] ?? post.user.lastName?.[0] ?? post.user.email[0].toUpperCase()}
-//                   </AvatarFallback>
-//                 </Avatar>
-
-//                 <div className="flex flex-col">
-//                   <p className="text-sm font-semibold">
-//                     {renderUser(safeUser)}
-//                   </p>
-//                   <p className="text-xs text-muted-foreground">
-//                     {post.time ?? new Date(post.createdAt).toLocaleDateString()}
-//                   </p>
-
-//                   <CardContent className="text-sm p-0 mt-1">
-//                     {post.content}
-//                   </CardContent>
-//                 </div>
-//               </CardHeader>
-
-//               {/* image caousel */}
-//               {post.images?.length ? (
-//                 <div className="relative w-full h-[300px]">
-//                   <Image
-//                     src={post.images[activeIndices[post.id] || 0]} // Handle active index
-//                     alt={`Post image ${activeIndices[post.id] || 0}`}
-//                     fill
-//                     className="object-cover"/>
-//                   {post.images.length > 1 && (
-//                     <div className="absolute inset-0 flex justify-between items-center">
-//                       <Button
-//                         variant="secondary"
-//                         onClick={() => handlePrevImage(post.id)}
-//                         disabled={activeIndices[post.id] === 0}>&lt;
-//                       </Button>
-//                       <Button
-//                         variant="secondary"
-//                         onClick={() => handleNextImage(post.id, post.images?.length || 0)}
-//                         disabled={activeIndices[post.id] === (post.images?.length || 0) - 1}>&gt;
-//                       </Button>
-//                     </div>
-//                   )}
-//                 </div>
-//               ) : null}
-
-//               {/* actions */}
-//               <CardFooter className="flex justify-around border-t">
-//                 <Button variant="ghost" size="sm">
-//                   <Heart className="h-4 w-4 mr-1" /> Like
-//                 </Button>
-//                 <Button variant="ghost" size="sm">
-//                   <MessageCircle className="h-4 w-4 mr-1" /> Comment
-//                 </Button>
-//                 <Button variant="ghost" size="sm">
-//                   <Share2 className="h-4 w-4 mr-1" /> Share
-//                 </Button>
-//               </CardFooter>
-//             </Card>
-//           );
-//         })}
+//         <main className="mx-auto w-full max-w-xl flex-1 px-4 py-6 sm:px-6">{mainContent}</main>
 //       </div>
-//     </>
+
+//       <CreatePostModal open={openPost} onClose={() => setOpenPost(false)} />
+//     </SidebarProvider>
 //   );
 // }
 
 
+"use client";
 
+import React, { useState, useEffect } from "react";
+import Image from "next/image";
+import Link from "next/link"; // Import Link here
+import InfiniteScroll from "react-infinite-scroll-component";
+import { useQuery } from "@tanstack/react-query";
+import { Heart, MessageCircle, Share2, Moon } from "lucide-react";
+import { Card, CardContent, CardFooter, CardHeader } from "../../components/ui/card";
+import { Avatar, AvatarFallback } from "../../components/ui/avatar";
+import { Button } from "../../components/ui/button";
+import { SidebarProvider } from "../../components/ui/sidebar";
+import ThemeDropdown from "../../components/ui/dropdown-theme";
+import ProfileDropdown from "../../components/ui/dropdown-profile";
+import { SkeletonLoader } from "../../components/ui/SkeletonLoader";
+import { renderUser } from "../../src/types/renderUser";
+import { Loader2 } from "lucide-react";
+import { CreatePostModal } from "../../src/components/posts/CreatePostModal";
+import { toast } from "sonner";
+import { auth } from "../../src/lib/firebase";
+import { getFirebaseToken, authFetch } from "../../src/services/auth.service";
+import CommentSection from "../../src/components/comments/CommentSection";
 
-'use client';
+// FeedPost component now only handles displaying content and comments
+const FeedPost = ({
+  post,
+  activeIndex,
+  handleLike,
+  handleCommentButtonClick,
+  isCommentSectionVisible,
+  userId,
+  likedPosts,
+  nextImage,
+  prevImage,
+}: {
+  post: Post;
+  activeIndex: number;
+  handleLike: (postId: string) => void;
+  handleCommentButtonClick: () => void;
+  isCommentSectionVisible: boolean;
+  userId: string;
+  likedPosts: Set<string>;
+  nextImage: (postId: string, length: number) => void;
+  prevImage: (postId: string) => void;
+}) => {
+  const isLiked = likedPosts.has(post.id);
 
-import React, { useState, useEffect , useRef} from 'react';
-import Image from 'next/image';
-import { useQuery } from '@tanstack/react-query';
-import { Heart, MessageCircle, Share2 } from 'lucide-react';
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import { Navbar } from '@/src/components/navbar/navbar';
-import { SkeletonLoader } from '@/components/ui/SkeletonLoader'; // Skeleton Loader Component
-import { renderUser } from '@/src/types/renderUser'; // User Rendering Helper
-import InfiniteScroll from 'react-infinite-scroll-component'; // Infinite Scroll Component
-import { Loader2 } from 'lucide-react'; // Loader icon
+  const renderUser = (user: User) => {
+    const fullName = `${user.firstName ?? 'Anonymous'} ${user.lastName ?? ''}`.trim();
+    return fullName;
+  };
 
-// User Type
+  return (
+    <Card key={post.id} className="shadow-md mb-6">
+      <CardHeader className="flex flex-row items-start gap-3">
+        <Avatar>
+          <AvatarFallback>{post.user.email[0]?.toUpperCase()}</AvatarFallback>
+        </Avatar>
+        <div className="flex flex-col">
+          <p className="text-sm font-semibold">{renderUser(post.user)}</p>
+          <p className="text-xs text-muted-foreground">
+            {post.time ?? new Date(post.createdAt).toLocaleDateString()}
+          </p>
+          <CardContent className="text-sm p-0 mt-1">{post.content}</CardContent>
+        </div>
+      </CardHeader>
+
+      {post.images?.length ? (
+        <div className="relative w-full h-[300px]">
+          <Image
+            src={post.images?.[activeIndex] || ""} // Ensure a valid image path
+            alt="Post image"
+            fill
+            className="object-cover"
+            loading="eager" />
+          {post.images.length > 1 && (
+            <div className="absolute inset-0 flex items-center justify-between px-2">
+              <Button size="sm" variant="secondary" onClick={() => prevImage(post.id)} disabled={activeIndex === 0}>
+                ‹
+              </Button>
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={() => nextImage(post.id, post.images?.length ?? 0)}
+                disabled={activeIndex === (post.images?.length ?? 0) - 1} >
+                ›
+              </Button>
+            </div>
+          )}
+        </div>
+      ) : null}
+
+      <CardFooter className="flex justify-around border-t">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => handleLike(post.id)}
+          disabled={isLiked}>
+          <Heart className="h-4 w-4 mr-1" />
+          {isLiked ? "Liked" : "Like"}
+        </Button>
+        <Button variant="ghost" size="sm" onClick={handleCommentButtonClick}>
+          <MessageCircle className="h-4 w-4 mr-1" /> Comment
+        </Button>
+        <Button variant="ghost" size="sm">
+          <Share2 className="h-4 w-4 mr-1" /> Share
+        </Button>
+      </CardFooter>
+      {/* Conditionally render the comment section */}
+      {isCommentSectionVisible && (
+        <CommentSection postId={post.id} userId={userId} />
+      )}
+    </Card>
+  );
+};
+
 interface User {
   id: string;
-  firstName?: string | null;
+  firstName?: string;
   lastName?: string | null;
   email: string;
 }
@@ -251,7 +383,7 @@ interface User {
 interface Post {
   id: string;
   content: string;
-  images?: string[]; // undefined
+  images?: string[]; // Ensure this is optional and handle null/undefined
   createdAt: string;
   user: User;
   time?: string;
@@ -262,171 +394,180 @@ interface FetchPostsResponse {
   hasMore: boolean;
 }
 
-// Page with pagination
 const fetchPosts = async (page: number): Promise<FetchPostsResponse> => {
-  const res = await fetch(`/api/posts?page=${page}&limit=5`);
-  if (!res.ok) {
-    throw new Error("Failed to fetch posts");
+  try {
+    const res = await authFetch(`/api/posts?page=${page}&limit=5`);
+    if (!res.ok) {
+      throw new Error(`Failed to fetch posts: ${res.status} ${res.statusText}`);
+    }
+
+    const contentType = res.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      throw new Error("Expected JSON response but received HTML");
+    }
+
+    const data = await res.json();
+    if (Array.isArray(data)) return { posts: data, hasMore: true };
+    return { posts: data.posts || [], hasMore: data.hasMore || false };
+  } catch (error) {
+    console.error("Error fetching posts:", error);
+    return { posts: [], hasMore: false };
   }
-  const data = await res.json();
-  if (Array.isArray(data)) return { posts: data, hasMore: true }; // If response is an array, assume more posts might exist
-  return { posts: data.posts || [], hasMore: data.hasMore || false };
 };
 
-// Feed Page Component
 export default function FeedPage() {
-  const [activeIndices, setActiveIndices] = useState<Record<string, number>>({}); // State to manage active image index for each post
-  const [delayedLoading, setDelayedLoading] = useState(true); // State to manage delayed loading for skeleton UI
-  const [page, setPage] = useState(1); // State to manage current page for pagination
-  const [hasMore, setHasMore] = useState(true); // State to manage if more posts are available for infinite scroll
-  const [loading, setLoading] = useState(false); // State to manage loading state for infinite scroll
-  const [allPosts, setAllPosts] = useState<Post[]>([]); // State to store all fetched posts
-  const scrollContainerRef = useRef<HTMLDivElement | null>(null); // Ref to manage the scroll container
+  const [page, setPage] = useState(1);
+  const [allPosts, setAllPosts] = useState<Post[]>([]);
+  const [hasMore, setHasMore] = useState(true);
+  const [activeIndices, setActiveIndices] = useState<Record<string, number>>({});
+  const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set());
+  const [delayedLoading, setDelayedLoading] = useState(true);
+  const [openPost, setOpenPost] = useState(false);
+  const [isCommentSectionVisible, setIsCommentSectionVisible] = useState(false);
 
   const { data, isLoading, isError } = useQuery<FetchPostsResponse>({
-    queryKey: ["posts", page], // Unique query key that includes page number for caching
-    queryFn: () => fetchPosts(page), // Query function that fetches posts based on current page
-    retry: 2, // Retry failed requests up to 2 times
-    placeholderData: (previousData) => previousData, // Keeps previous data while loading new page
+    queryKey: ["posts", page],
+    queryFn: () => fetchPosts(page),
+    retry: 2,
+    placeholderData: (prev) => prev,
   });
 
   useEffect(() => {
-    if (data?.posts) {
-      setAllPosts((prev) => [...prev ,...data.posts]); // Append new posts to the top
-      setHasMore(data.hasMore); // Update hasMore based on API response
-    }
-  }, [data]);
+    if (!data?.posts) return;
+    setHasMore(data.hasMore);
+    setAllPosts((prev) => (page === 1 ? data.posts : [...prev, ...data.posts]));
+  }, [data, page]);
 
-  // Simulate a loading delay
   useEffect(() => {
     if (!isLoading && !isError) {
-      const timer = setTimeout(() => {
-        setDelayedLoading(false);
-      }, 2000);
+      const timer = setTimeout(() => setDelayedLoading(false), 1000);
       return () => clearTimeout(timer);
     }
   }, [isLoading, isError]);
 
-  const nextImage = (postId: string, length: number) => {
-    setActiveIndices((prev) => ({
-      ...prev,
-      [postId]: Math.min((prev[postId] ?? 0) + 1, length - 1),
-    }));
-  }; // Function to handle next image in carousel
+  const nextImage = (postId: string, length: number) =>
+    setActiveIndices((prev) => ({ ...prev, [postId]: Math.min((prev[postId] ?? 0) + 1, length - 1) }));
 
-  const prevImage = (postId: string) => {
-    setActiveIndices((prev) => ({
-      ...prev,
-      [postId]: Math.max((prev[postId] ?? 0) - 1, 0),
-    }));
-  }; // Function to handle previous image in carousel
+  const prevImage = (postId: string) =>
+    setActiveIndices((prev) => ({ ...prev, [postId]: Math.max((prev[postId] ?? 0) - 1, 0) }));
 
-  // Function to load more posts when the user scrolls to the end
   const loadMorePosts = () => {
-    if (!loading && hasMore) {
-      setLoading(true);
-      setTimeout(() => {
-        setPage((prev) => prev + 1); // Increment page number to fetch the next set of posts
-        setLoading(false);
-      }, 1000); // Simulate a slight delay before loading new posts
+    if (hasMore) setPage((prev) => prev + 1);
+  };
+
+  const handleLike = async (postId: string) => {
+    try {
+      const user = auth.currentUser;
+      if (!user) {
+        alert("You need to be logged in to like posts.");
+        return;
+      }
+
+      const token = await user.getIdToken(true);
+
+      const response = await fetch("/api/posts/like", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ postId }),
+      });
+
+      if (response.ok) {
+        setLikedPosts((prevState) => {
+          const newSet = new Set(prevState); // Create a new Set
+          newSet.add(postId); // Add postId to the Set
+          return newSet; // Return the updated Set
+        });
+        console.log(`Post ${postId} liked successfully.`);
+      } else {
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("text/html")) {
+          toast("Please log in to like posts");
+          return;
+        }
+
+        try {
+          const error = await response.json();
+          toast(error.message || "Error liking post");
+        } catch {
+          toast("Error liking post");
+        }
+      }
+    } catch (error) {
+      console.error("Error liking post:", error);
+      toast("Something went wrong. Please try again.");
     }
   };
 
-  if (isLoading || delayedLoading) return <SkeletonLoader />; // Show skeleton loader while loading or if loading takes too long
-  if (isError) return <p className="text-center py-10">Something Went Wrong.</p>;
-  if (data?.posts.length === 0) return <p className="text-center py-10">No posts yet.</p>;
+  const posts = allPosts;
 
-  // const posts = data?.posts || []; // Extract posts from query data
-  const posts = allPosts; // Use allPosts state which contains all fetched posts
-  const hasMoreData = data?.hasMore || false; // Extract hasMore from query data
+  const mainContent = isLoading || delayedLoading ? (
+    <SkeletonLoader />
+  ) : isError ? (
+    <p className="text-center py-10">Something went wrong.</p>
+  ) : posts.length === 0 ? (
+    <p className="text-center py-10">No posts yet.</p>
+  ) : (
+    <InfiniteScroll
+      dataLength={posts.length}
+      next={loadMorePosts}
+      hasMore={hasMore}
+      scrollThreshold={0.9}
+      loader={
+        <div className="flex justify-center my-4">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
+      }
+      endMessage={<p className="flex justify-center py-4">No more posts to show</p>}
+    >
+      {posts.map((post, index) => {
+        const activeIndex = activeIndices[post.id] ?? 0;
+
+        return (
+          <FeedPost
+            key={post.id + "-" + index}
+            post={post}
+            activeIndex={activeIndex}
+            handleLike={handleLike}
+            handleCommentButtonClick={() => setIsCommentSectionVisible((prev) => !prev)}
+            isCommentSectionVisible={isCommentSectionVisible}
+            userId={post.user.id}
+            likedPosts={likedPosts}
+            nextImage={nextImage}
+            prevImage={prevImage}
+          />
+        );
+      })}
+    </InfiniteScroll>
+  );
 
   return (
-    <>
-      <Navbar />
-      <div className="mx-auto max-w-xl flex flex-col gap-6 py-6" ref= {scrollContainerRef}>
-        <InfiniteScroll
-          dataLength={posts.length}
-          next={loadMorePosts}
-          hasMore={hasMoreData}
-          loader={
-            <div className="flex justify-center my-4">
-              <Loader2 className="h-8 w-8 animate-spin" />
+    <SidebarProvider>
+      <div className="flex min-h-dvh w-full flex-col">
+        <header className="bg-card sticky top-0 z-50 border-b">
+          <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-4 py-2 sm:px-6">
+            <Link href="/feed" className="flex items-center gap-2">
+              <div className="w-[50px] h-[50px] rounded-full overflow-hidden">
+                <Image src="/logo.png" alt="Logo" width={50} height={50} className="object-cover w-full h-full scale-150" />
+              </div>
+              <span className="lg:text-lg font-extrabold text-black italic tracking-wider animate-pulse">Zentia</span>
+            </Link>
+
+            <div className="flex items-center gap-1.5">
+              <ThemeDropdown trigger={<Button variant="ghost" size="icon"><Moon className="size-8" /></Button>} />
+              <Button size="sm" variant="secondary" onClick={() => setOpenPost(true)} className="transition-all duration-200 ease-in-out hover:scale-105 active:scale-95">
+                New Post
+              </Button>
+              <ProfileDropdown trigger={<Button variant="ghost" size="icon"><Avatar><AvatarFallback>U</AvatarFallback></Avatar></Button>} />
             </div>
-          }
-          endMessage={<p className="flex justify-center py-4">No more posts to show</p>}
-          scrollThreshold={0.9}
-        >
-          {posts.map((post, index) => {
-            console.log("Post ID: ", post.id);
-            const activeIndex = activeIndices[post.id] ?? 0;
-            const safeUser = {
-              ...post.user,
-              firstName: post.user.firstName ?? 'Anonymous',
-              lastName: post.user.lastName ?? '',
-            };
-
-            return (
-             <Card key={`${post.id}-${index}`} className="shadow-md">
-                <CardHeader className="flex flex-row items-start gap-3">
-                  <Avatar>
-                    <AvatarFallback>{safeUser.email[0]?.toUpperCase()}</AvatarFallback>
-                  </Avatar>
-                  <div className="flex flex-col">
-                    <p className="text-sm font-semibold">{renderUser(safeUser)}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {post.time ?? new Date(post.createdAt).toLocaleDateString()}
-                    </p>
-                    <CardContent className="text-sm p-0 mt-1">{post.content}</CardContent>
-                  </div>
-                </CardHeader>
-
-                {post.images?.length ? (
-                  <div className="relative w-full h-[300px]">
-                    <Image
-                      src={post.images[activeIndex]}
-                      alt="Post image"
-                      fill
-                      loading="eager"
-                      className="object-cover"
-                    />
-                    {post.images.length > 1 && (
-                      <div className="absolute inset-0 flex items-center justify-between px-2">
-                        <Button size="sm" variant="secondary" onClick={() => prevImage(post.id)} disabled={activeIndex === 0}>
-                          ‹
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="secondary"
-                          onClick={() => nextImage(post.id, post.images!.length)}
-                          disabled={activeIndex === post.images.length - 1}
-                        >
-                          ›
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                ) : null}
-
-                <CardFooter className="flex justify-around border-t">
-                  <Button variant="ghost" size="sm">
-                    <Heart className="h-4 w-4 mr-1" /> Like
-                  </Button>
-                  <Button variant="ghost" size="sm">
-                    <MessageCircle className="h-4 w-4 mr-1" /> Comment
-                  </Button>
-                  <Button variant="ghost" size="sm">
-                    <Share2 className="h-4 w-4 mr-1" /> Share
-                  </Button>
-                </CardFooter>
-              </Card>
-            );
-          })}
-        </InfiniteScroll>
+          </div>
+        </header>
+        <main className="mx-auto w-full max-w-xl flex-1 px-4 py-6 sm:px-6">{mainContent}</main>
       </div>
-    </>
+
+      <CreatePostModal open={openPost} onClose={() => setOpenPost(false)} />
+    </SidebarProvider>
   );
 }
-
-
-
-

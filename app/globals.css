@@ -4,7 +4,6 @@
 
 @custom-variant dark (&:is(.dark *));
 
-
 :root {
   --primary: hsl(222.2 47.4% 11.2%);   
   --background: oklch(1 0 0);

@@ -35,3 +35,5 @@ yarn-error.log*
 .env.local
 .env.development
 .env.production
+# Ignore Firebase service account key
+src/lib/serviceAccountKey.json

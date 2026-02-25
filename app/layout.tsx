@@ -1,5 +1,5 @@
 import "./globals.css";
-import { ReactQueryProvider } from "@/src/providers/ReactQueryProvider";
+import { ReactQueryProvider } from "@/providers/ReactQueryProvider";
 import { Toaster } from "sonner"
 
 export default function RootLayout({
@@ -10,11 +10,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="min-h-screen antialiased text-black dark:text-white">
-  <ReactQueryProvider>
-    {children}
-    <Toaster position="top-center" richColors />
-  </ReactQueryProvider>
-</body>
+        <ReactQueryProvider>
+          {children}
+          <Toaster position="top-center" richColors />
+        </ReactQueryProvider>
+      </body>
 
     </html>
   );

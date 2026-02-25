@@ -6,31 +6,76 @@ import {
   CreateDateColumn,
   OneToMany,
 } from "typeorm";
-import type { Post } from "./post"; // type-only import
+import type { Post } from "./post";
+import type { Like } from "./like";
+import type { Comment } from "./comment";
 
 @Entity("users")
 export class User {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
-  @Column({ nullable: true })
+  @Column({ type: "varchar", length: 255, nullable: true })
   firstName?: string;
 
-  @Column({ nullable: true })
+  @Column({ type: "varchar", length: 255, nullable: true })
   lastName?: string;
 
-  @Column({ unique: true })
+  @Column({ type: "varchar", length: 255, unique: true })
   email!: string;
 
-  @Column({ default: true })
+  @Column({ type: "varchar", length: 500, nullable: true })
+  avatarUrl?: string;
+
+  @Column({ type: "text", nullable: true })
+  bio?: string;
+
+  @Column({ type: "varchar", length: 255, nullable: true })
+  jobTitle?: string;
+
+  @Column({ type: "varchar", length: 255, nullable: true })
+  company?: string;
+
+  @Column({ type: "varchar", length: 50, nullable: true })
+  phone?: string;
+
+  @Column({ type: "varchar", length: 255, nullable: true })
+  location?: string;
+
+  @Column({ type: "varchar", length: 500, nullable: true })
+  website?: string;
+
+  @Column({ type: "varchar", length: 255, nullable: true })
+  github?: string;
+
+  @Column({ type: "varchar", length: 255, nullable: true })
+  linkedin?: string;
+
+  @Column({ type: "varchar", length: 255, nullable: true })
+  twitter?: string;
+
+  @Column({ type: "text", array: true, nullable: true })
+  skills?: string[];
+
+  @Column({ type: "text", array: true, nullable: true })
+  hobbies?: string[];
+
+  @Column({ type: "boolean", default: true })
   isActive!: boolean;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: "timestamp" })
   createdAt!: Date;
 
-  @Column({ nullable: true })
+  @Column({ type: "varchar", length: 255, nullable: true })
   firebaseUid?: string;
 
-  @OneToMany(() => require("./post").Post, (post: Post) => post.user)
+  // Relations use string references to avoid circular imports
+  @OneToMany("Post", "user")
   posts!: Post[];
+
+  @OneToMany("Like", "user")
+  likes!: Like[];
+
+  @OneToMany("Comment", "user")
+  comments!: Comment[];
 }

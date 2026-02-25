@@ -1,5 +1,5 @@
-import { Skeleton } from "@/components/ui/skeleton";
-import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import { Skeleton } from "./skeleton";
+import { Card, CardHeader, CardContent } from "./card";
 
 export const SkeletonLoader = () => (
   <div className="mx-auto max-w-xl flex flex-col gap-6 py-6">

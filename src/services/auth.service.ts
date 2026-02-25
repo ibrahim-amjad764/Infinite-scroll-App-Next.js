@@ -2,7 +2,75 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "fire
 // import { auth } from "@/src/lib/firebase"
 import { signOut } from "firebase/auth";
 import { getAuth } from "firebase/auth"
-import { app } from "@/src/lib/firebase"
+import { app } from "@/lib/firebase"
+
+// Function to get or refresh the Firebase token
+export const getFirebaseToken = async () => {
+  const auth = getAuth(app);
+  const currentUser = auth.currentUser;
+  
+  if (!currentUser) {
+    throw new Error("User not logged in");
+  }
+
+  try {
+    // Get a fresh token if the token is expired
+    const token = await currentUser.getIdToken(true);  // 'true' forces refresh
+    console.log("Firebase Token refreshed:", token?.slice(0, 20), "...");
+    return token;
+  } catch (error) {
+    console.error("Error fetching Firebase token:", error);
+    throw error;
+  }
+};
+
+// Refresh token and update the auth-token cookie
+export const refreshAuthToken = async (): Promise<boolean> => {
+  try {
+    const token = await getFirebaseToken();
+    const res = await fetch("/api/auth/refresh", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) {
+      console.error("Failed to refresh auth cookie");
+      return false;
+    }
+    console.log("Auth cookie refreshed successfully");
+    return true;
+  } catch (error) {
+    console.error("Error refreshing auth token:", error);
+    return false;
+  }
+};
+
+// Wrapper for fetch that auto-refreshes token on 401
+export const authFetch = async (url: string, options: RequestInit = {}): Promise<Response> => {
+  let res = await fetch(url, options);
+  
+  // If 401 (Unauthorized), try refreshing token and retry once
+  if (res.status === 401) {
+    console.log("Got 401, attempting token refresh...");
+    const refreshed = await refreshAuthToken();
+    if (refreshed) {
+      // Retry the original request
+      res = await fetch(url, options);
+    }
+  }
+  
+  // Check if response is HTML (indicating a redirect to login page)
+  const contentType = res.headers.get("content-type");
+  if (contentType && contentType.includes("text/html")) {
+    console.error("authFetch received HTML instead of JSON - likely unauthenticated");
+    // Create a proper JSON error response
+    return new Response(JSON.stringify({ error: "Unauthorized - Please log in" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" }
+    });
+  }
+  
+  return res;
+};
 
 // Sign UP
 export async function signUp(email: string, password: string) {
@@ -107,6 +175,3 @@ export const logout = async () => {
     throw error
   }
 }
-
-
-

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { fetchUserProfile, updateUserProfile } from "../../api/profile-user/user";
-import ProfileContent from "@/components/membership/profile-page/ProfileContent";
+import ProfileContent from "../../../src/components/membership/profile-page/ProfileContent";
 import Loader from "../../../components/ui/Loader";
 import { Button } from "../../../components/ui/button";
 

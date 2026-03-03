@@ -105,40 +105,51 @@
 //   );
 // }
 // export default ProfileCard;
-
-
 "use client";
 
 import InfiniteScroll from "react-infinite-scroll-component";
 import { Loader2 } from "lucide-react";
 import { Card } from "../../../../components/ui/card";
 
+// Post & Comment types
+interface Comment {
+  id: string;
+  content: string;
+  user: {
+    id: string;
+    firstName: string;
+    lastName?: string;
+  };
+  createdAt: string;
+}
+
 interface Post {
   id: string;
   content: string;
   images?: string[];
   createdAt: string;
+  likesCount: number;
+  comments?: Comment[];
 }
 
 interface ProfileCardProps {
-  posts: Post[];
+  posts?: Post[];       // optional, default to empty
   hasMore: boolean;
-  loadMore: () => void; 
+  loadMore: () => void;
 }
 
-const ProfileCard = ({ posts, hasMore, loadMore }: ProfileCardProps) => {
+const ProfileCard = ({ posts = [], hasMore, loadMore }: ProfileCardProps) => {
+  console.log("[ProfileCard] Rendering posts:", posts);
+
   return (
     <div className="w-full px-3 sm:px-4 md:px-6">
       <div className="w-full max-w-2xl mx-auto space-y-6">
-
         <h3 className="text-xl sm:text-2xl font-semibold text-slate-800">
           My Posts ({posts.length})
         </h3>
 
         {posts.length === 0 && (
-          <p className="text-center text-gray-400 text-sm">
-            No posts yet.
-          </p>
+          <p className="text-center text-gray-400 text-sm">No posts yet.</p>
         )}
 
         {posts.length > 0 && (
@@ -156,27 +167,67 @@ const ProfileCard = ({ posts, hasMore, loadMore }: ProfileCardProps) => {
               <p className="text-center text-gray-600 text-sm mt-4 italic">
                 No more posts exist for this user.
               </p>
-            }>
+            }
+          >
             <div className="space-y-4">
               {posts.map((post) => (
                 <Card
                   key={post.id}
-                  className="p-4 bg-white border border-gray-200 shadow-sm w-full overflow-hidden">
-                  <p className="text-sm sm:text-base text-gray-700 wrap-break-words">
+                  className="p-4 bg-white border border-gray-200 shadow-sm w-full overflow-hidden"
+                >
+                  {/* Post content */}
+                  <p className="text-sm sm:text-base text-gray-700 break-words">
                     {post.content}
                   </p>
 
+                  {/* Optional post image */}
                   {post.images?.length ? (
                     <div className="mt-3 w-full">
                       <img
                         src={post.images[0]}
-                        alt=""
-                        className="w-full max-h-72 object-cover rounded-md" />
+                        alt="Post image"
+                        className="w-full max-h-72 object-cover rounded-md"
+                      />
                     </div>
                   ) : null}
-                  <p className="text-xs text-gray-500 mt-3">
-                    {new Date(post.createdAt).toLocaleDateString()}
+
+                  {/* Post date */}
+                  <p className="text-xs text-gray-500 mt-2">
+                    {new Date(post.createdAt).toLocaleString()}
                   </p>
+
+                  {/* Likes */}
+                  <p className="font-semibold text-sm mt-2">
+                    Likes: {post.likesCount || 0}
+                  </p>
+
+                  {/* Comments */}
+                  <div className="text-sm mt-2">
+                    <p className="font-semibold mb-1">
+                      Comments ({post.comments?.length || 0}):
+                    </p>
+
+                    {(!post.comments || post.comments.length === 0) && (
+                      <p className="text-gray-400">No comments yet.</p>
+                    )}
+
+                    <ul className="space-y-2">
+                      {post.comments?.map((comment) => (
+                        <li key={comment.id} className="border-t pt-1">
+                          <p>
+                            <strong>
+                              {comment.user.firstName}{" "}
+                              {comment.user.lastName || ""}:
+                            </strong>{" "}
+                            {comment.content}
+                          </p>
+                          <p className="text-xs text-gray-400">
+                            {new Date(comment.createdAt).toLocaleString()}
+                          </p>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 </Card>
               ))}
             </div>
@@ -186,4 +237,5 @@ const ProfileCard = ({ posts, hasMore, loadMore }: ProfileCardProps) => {
     </div>
   );
 };
+
 export default ProfileCard;

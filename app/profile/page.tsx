@@ -68,20 +68,59 @@
 
 // export default ProfilePage;
 
+
+// app/profile/page.tsx
 "use client";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { fetchUserProfile, fetchMyPosts } from "../../app/api/profile-user/user";
-import ProfileCard from "@/components/membership/profile-page/ProfileCard";
-import ProfileHeader from "@/components/membership/profile-page/ProfileHeader";
+import ProfileCard from "../../src/components/membership/profile-page/ProfileCard";
+import ProfileHeader from "../../src/components/membership/profile-page/ProfileHeader";
 import Loader from "../../components/ui/Loader";
-import { getAuth, getIdToken } from 'firebase/auth'; // Import from the modular SDK
-import { initializeApp, getApps, getApp } from 'firebase/app';
-import { getFirebaseToken } from "@/services/auth.service"; // Import the helper function
+import { getAuth, getIdToken } from "firebase/auth";
+import { initializeApp, getApps, getApp } from "firebase/app";
+import { fetchUserProfile, fetchMyPosts } from "../../app/api/profile-user/user";
 
-// Initialize Firebase with your config (make sure to do this only once)
+// -----------------------------
+// Types
+// -----------------------------
+interface ProfileUser {
+  firstName?: string;
+  lastName?: string;
+  email: string;
+  bio?: string;
+  avatarUrl?: string;
+  jobTitle?: string;
+  company?: string;
+  location?: string;
+  createdAt?: string;
+}
+
+interface Comment {
+  id: string;
+  content: string;
+  user: {
+    id: string;
+    firstName: string;
+    lastName?: string;
+  };
+  createdAt: string;
+}
+
+interface Post {
+  id: string;
+  content: string;
+  images?: string[];
+  createdAt: string;
+  likesCount: number;
+  comments: Comment[];
+  commentsCount: number;
+}
+
+// -----------------------------
+// Firebase Config
+// -----------------------------
 const firebaseConfig = {
   apiKey: "YOUR_API_KEY",
   authDomain: "YOUR_AUTH_DOMAIN",
@@ -89,107 +128,155 @@ const firebaseConfig = {
   storageBucket: "YOUR_STORAGE_BUCKET",
   messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
   appId: "YOUR_APP_ID",
-  measurementId: "YOUR_MEASUREMENT_ID"
+  measurementId: "YOUR_MEASUREMENT_ID",
 };
 
-// Initialize Firebase
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
+// -----------------------------
+// Helper: Merge likes & comments into posts
+// -----------------------------
+const mergeLikesCommentsIntoPosts = (
+  posts: Post[],
+  likesData: { postid: string; count: number }[],
+  commentsData: { postid: string; commentid: string; content: string; userid: string; firstName: string; lastName?: string; createdAt: string }[]
+) => {
+  const likesMap: Record<string, number> = {};
+  likesData.forEach(like => {
+    likesMap[like.postid] = like.count; // <-- use actual count
+  });
+
+  const commentsMap: Record<string, Comment[]> = {};
+  commentsData.forEach(comment => {
+    if (!commentsMap[comment.postid]) commentsMap[comment.postid] = [];
+    commentsMap[comment.postid].push({
+      id: comment.commentid,
+      content: comment.content,
+      user: { id: comment.userid, firstName: comment.firstName, lastName: comment.lastName },
+      createdAt: comment.createdAt,
+    });
+  });
+
+  return posts.map(post => ({
+    ...post,
+    likesCount: likesMap[post.id] || 0,
+    comments: commentsMap[post.id] || [],
+    commentsCount: commentsMap[post.id]?.length || 0,
+  }));
+};
+
+// -----------------------------
+// Fetch likes & comments for posts
+// -----------------------------
+const fetchLikesForPosts = async (postIds: string[]) => {
+  const res = await fetch(`/api/posts/like?postIds=${postIds.join(",")}`, {
+    credentials: "include",
+  });
+  if (!res.ok) return [];
+  return await res.json();
+};
+
+const fetchCommentsForPosts = async (postIds: string[]) => {
+  const res = await fetch(`/api/posts/comment?postIds=${postIds.join(",")}`, {
+    credentials: "include",
+  });
+  if (!res.ok) return [];
+  return await res.json();
+};
+
+// -----------------------------
+// Component
+// -----------------------------
 const ProfilePage = () => {
-  const [user, setUser] = useState<any>(null);
-  const [posts, setPosts] = useState<any[]>([]);
+  const [user, setUser] = useState<ProfileUser | null>(null);
+  const [posts, setPosts] = useState<Post[]>([]);
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
 
   const router = useRouter();
 
-  // Set page title
   useEffect(() => {
     document.title = "Profile | My Next JS App";
   }, []);
 
-  // Fetch user profile & posts whenever page changes
   useEffect(() => {
-    const load = async () => {
+    const loadProfile = async () => {
       if (loading) return;
       setLoading(true);
 
       try {
-        // Attempt to get fresh token if needed
         const token = await getFirebaseToken();
-
         if (!token) {
-          toast.error("Please login again. Your session has expired.");
-          router.push("/login"); // Redirect to login page
+          toast.error("Please login again. Session expired.");
+          router.push("/auth/login");
           return;
         }
 
         const userProfile = await fetchUserProfile();
-        const { posts: myPosts, hasMore: more } = await fetchMyPosts(page);
-        setUser(userProfile);
+        const { posts: rawPosts, hasMore: more } = await fetchMyPosts(page);
 
-        // Append posts if page > 1, else replace
-        setPosts((prev) => (page === 1 ? myPosts : [...prev, ...myPosts]));
+        setUser({
+          ...userProfile,
+          email: userProfile.email || "unknown@example.com",
+        });
+
+        // Get post IDs
+        const postIds: string[] = rawPosts.map((p: Post) => p.id);
+
+        // Fetch likes and comments
+        const likesData = await fetchLikesForPosts(postIds);
+        const commentsData = await fetchCommentsForPosts(postIds);
+
+        // Merge into posts
+        const postsWithEngagement: Post[] = mergeLikesCommentsIntoPosts(
+          rawPosts,
+          likesData,
+          commentsData
+        );
+
+        setPosts(prev => (page === 1 ? postsWithEngagement : [...prev, ...postsWithEngagement]));
         setHasMore(more);
       } catch (error) {
-        console.error("[ProfilePage] Fetch error:", error);
+        console.error("[ProfilePage] Error fetching profile/posts:", error);
         toast.error("Failed to load profile. Please try again.");
       } finally {
         setLoading(false);
       }
     };
-    load();
+
+    loadProfile();
   }, [page]);
 
-  // Get Firebase token (force refresh if expired)
-  const getFirebaseToken = async () => {
+  const getFirebaseToken = async (): Promise<string | null> => {
     try {
-      const auth = getAuth(app); // Use the correct auth instance
+      const auth = getAuth(app);
       const currentUser = auth.currentUser;
       if (!currentUser) return null;
 
-      // Get a fresh token if the token is expired
-      const token = await getIdToken(currentUser, true);  // true to force refresh
-      console.log("Firebase Token refreshed:", token);
-      return token;
+      return await getIdToken(currentUser, true);
     } catch (error) {
-      console.error("Error fetching Firebase token:", error);
+      console.error("Error getting Firebase token:", error);
       return null;
     }
   };
 
-  // Edit profile button
   const handleEditProfile = () => router.push("/profile/edit");
 
-  // Show loader until user is loaded
-  if (!user)
-    return (
-      <Loader
-        title="Loading profile..."
-        subtitle="Fetching your account details"
-        size="md" />
-    );
+  if (!user) {
+    return <Loader title="Loading profile..." subtitle="Fetching your account details" size="md" />;
+  }
 
-  // Load next page of posts
   const loadMorePosts = () => {
-    if (!loading && hasMore) setPage((prev) => prev + 1);
+    if (!loading && hasMore) setPage(prev => prev + 1);
   };
 
   return (
     <div className="min-h-screen bg-slate-100 text-gray-900">
       <div className="w-full px-10 py-10 space-y-6">
         <div className="bg-gray-500/10 rounded-lg shadow-md p-6 space-y-4">
-          <ProfileHeader
-            user={user}
-            onEdit={handleEditProfile}
-            showEditButton />
-          
-          {/* Infinite scroll posts */}
-          <ProfileCard
-            posts={posts}
-            hasMore={hasMore}
-            loadMore={loadMorePosts} />
+          <ProfileHeader user={user} onEdit={handleEditProfile} showEditButton />
+          <ProfileCard posts={posts} hasMore={hasMore} loadMore={loadMorePosts} />
         </div>
       </div>
     </div>

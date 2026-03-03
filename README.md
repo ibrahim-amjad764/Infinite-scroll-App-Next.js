@@ -211,6 +211,7 @@ NEXT-TYPEORM-POSTGRES/
 │   │
 │   └── types/
 │       ├── post.ts
+│       ├── profile.ts
 │       ├── renderUser.ts
 │       └── users.ts
 

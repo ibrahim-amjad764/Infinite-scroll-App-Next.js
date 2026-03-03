@@ -1,12 +1,5 @@
 // src/entities/like.ts
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  ManyToOne,
-  JoinColumn,
-  CreateDateColumn,
-  Index,
-} from "typeorm";
+import {Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn, CreateDateColumn, Index } from "typeorm";
 import type { Post } from "./post";
 import type { User } from "./user";
 

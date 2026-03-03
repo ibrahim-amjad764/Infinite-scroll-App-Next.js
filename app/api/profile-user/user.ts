@@ -55,3 +55,4 @@ export const updateUserProfile = async (user: any) => {
     throw new Error("An unexpected error occurred while updating the user profile.");
   }
 };
+

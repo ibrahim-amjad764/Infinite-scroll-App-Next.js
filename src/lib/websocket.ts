@@ -24,9 +24,9 @@ export function setupWebSocketServer(server: any) {
           return;
         }
 
-        const commentRepo = AppDataSource.getRepository(Comment);
-        const postRepo = AppDataSource.getRepository(Post);
-        const userRepo = AppDataSource.getRepository(User);
+        const commentRepo = AppDataSource!.getRepository(Comment);
+        const postRepo = AppDataSource!.getRepository(Post);
+        const userRepo = AppDataSource!.getRepository(User);
 
         // Ensure that the post and user exist before creating a comment
         const post = await postRepo.findOneBy({ id: postId });
@@ -52,7 +52,7 @@ export function setupWebSocketServer(server: any) {
 
         // Save the comment to the database
         const savedComment = await commentRepo.save(newComment);
-         console.log(`[WebSocket] Saved comment: ${savedComment.id}`);
+        console.log(`[WebSocket] Saved comment: ${savedComment.id}`);
 
         // Broadcast the new comment to all connected clients
         wss.clients.forEach((client: WebSocket) => {

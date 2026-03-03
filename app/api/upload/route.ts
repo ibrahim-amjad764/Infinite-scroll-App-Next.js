@@ -1,6 +1,6 @@
 // app/api/upload/route.ts
 import { NextResponse } from "next/server";
-import cloudinary from "@/lib/cloudinary"; // your server-side Cloudinary SDK
+import cloudinary from "../../../src/lib/cloudinary"; // your server-side Cloudinary SDK
 
 export async function POST(req: Request) {
   const formData = await req.formData();

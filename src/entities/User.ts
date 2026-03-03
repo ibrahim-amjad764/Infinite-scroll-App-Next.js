@@ -1,11 +1,5 @@
 // src/entities/user.ts
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  CreateDateColumn,
-  OneToMany,
-} from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany } from "typeorm";
 import type { Post } from "./post";
 import type { Like } from "./like";
 import type { Comment } from "./comment";

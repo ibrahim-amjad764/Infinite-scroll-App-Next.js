@@ -259,7 +259,7 @@
 
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link"; // Import Link here
 import InfiniteScroll from "react-infinite-scroll-component";
@@ -269,8 +269,6 @@ import { Card, CardContent, CardFooter, CardHeader } from "../../components/ui/c
 import { Avatar, AvatarFallback } from "../../components/ui/avatar";
 import { Button } from "../../components/ui/button";
 import { SidebarProvider } from "../../components/ui/sidebar";
-import ThemeDropdown from "../../components/ui/dropdown-theme";
-import ProfileDropdown from "../../components/ui/dropdown-profile";
 import { SkeletonLoader } from "../../components/ui/SkeletonLoader";
 import { renderUser } from "../../src/types/renderUser";
 import { Loader2 } from "lucide-react";
@@ -278,9 +276,12 @@ import { CreatePostModal } from "../../src/components/posts/CreatePostModal";
 import { toast } from "sonner";
 import { auth } from "../../src/lib/firebase";
 import { getFirebaseToken, authFetch } from "../../src/services/auth.service";
-import CommentSection from "../../src/components/comments/CommentSection";
+import ThemeDropdown from "../../components/ui/dropdown-theme";
+import ProfileDropdown from "../../components/ui/dropdown-profile";
+import CommentSection from "../../src/components/posts/comments/CommentSection";
+import { LikeButton } from "../../src/components/posts/likes/LikeButton";
 
-// FeedPost component now only handles displaying content and comments
+// FeedPost displaying content and comments
 const FeedPost = ({
   post,
   activeIndex,
@@ -308,6 +309,7 @@ const FeedPost = ({
     const fullName = `${user.firstName ?? 'Anonymous'} ${user.lastName ?? ''}`.trim();
     return fullName;
   };
+  
 
   return (
     <Card key={post.id} className="shadow-md mb-6">
@@ -348,24 +350,21 @@ const FeedPost = ({
           )}
         </div>
       ) : null}
-
-      <CardFooter className="flex justify-around border-t">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => handleLike(post.id)}
-          disabled={isLiked}>
-          <Heart className="h-4 w-4 mr-1" />
-          {isLiked ? "Liked" : "Like"}
-        </Button>
-        <Button variant="ghost" size="sm" onClick={handleCommentButtonClick}>
-          <MessageCircle className="h-4 w-4 mr-1" /> Comment
-        </Button>
-        <Button variant="ghost" size="sm">
-          <Share2 className="h-4 w-4 mr-1" /> Share
-        </Button>
-      </CardFooter>
-      {/* Conditionally render the comment section */}
+      
+<CardFooter className="flex justify-around border-t">
+  <LikeButton
+    postId={post.id}
+    initialIsLiked={isLiked} // true/false if the current user liked it
+    initialLikesCount={post.likesCount || 0}  // pass the likesCount to the button
+    userId={userId} // User ID to identify the current user
+  />
+  <Button variant="ghost" size="sm" onClick={handleCommentButtonClick}>
+    <MessageCircle className="h-4 w-4 mr-1 " /> Comment
+  </Button>
+  <Button variant="ghost" size="sm">
+    <Share2 className="h-4 w-4 mr-1" /> Share
+  </Button>
+</CardFooter>
       {isCommentSectionVisible && (
         <CommentSection postId={post.id} userId={userId} />
       )}
@@ -383,9 +382,10 @@ interface User {
 interface Post {
   id: string;
   content: string;
-  images?: string[]; // Ensure this is optional and handle null/undefined
+  images?: string[]; 
   createdAt: string;
   user: User;
+  likesCount?: number; 
   time?: string;
 }
 
@@ -433,6 +433,10 @@ export default function FeedPage() {
   });
 
   useEffect(() => {
+    document.title = "Feed Page | My Next JS App";
+  }, []);
+
+  useEffect(() => {
     if (!data?.posts) return;
     setHasMore(data.hasMore);
     setAllPosts((prev) => (page === 1 ? data.posts : [...prev, ...data.posts]));
@@ -455,51 +459,68 @@ export default function FeedPage() {
     if (hasMore) setPage((prev) => prev + 1);
   };
 
-  const handleLike = async (postId: string) => {
-    try {
-      const user = auth.currentUser;
-      if (!user) {
-        alert("You need to be logged in to like posts.");
+const handleLike = async (postId: string) => {
+  try {
+    const user = auth.currentUser;
+    if (!user) {
+      console.warn(`[Like] User not logged in, cannot like post ${postId}`);
+      toast("You need to be logged in to like posts.");
+      return;
+    }
+
+    const token = await user.getIdToken(true);
+
+    console.log(`[Like] Sending like/unlike request for post ${postId}...`);
+
+    const response = await fetch("/api/posts/like", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ postId }),
+    });
+
+    if (!response.ok) {
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("text/html")) {
+        console.warn(`[Like] Not authorized to like post ${postId}`);
+        toast("Please log in to like posts");
         return;
       }
 
-      const token = await user.getIdToken(true);
-
-      const response = await fetch("/api/posts/like", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ postId }),
-      });
-
-      if (response.ok) {
-        setLikedPosts((prevState) => {
-          const newSet = new Set(prevState); // Create a new Set
-          newSet.add(postId); // Add postId to the Set
-          return newSet; // Return the updated Set
-        });
-        console.log(`Post ${postId} liked successfully.`);
-      } else {
-        const contentType = response.headers.get("content-type");
-        if (contentType && contentType.includes("text/html")) {
-          toast("Please log in to like posts");
-          return;
-        }
-
-        try {
-          const error = await response.json();
-          toast(error.message || "Error liking post");
-        } catch {
-          toast("Error liking post");
-        }
+      try {
+        const error = await response.json();
+        console.error(`[Like] Error liking post ${postId}:`, error.message);
+        toast(error.message || "Error liking post");
+      } catch {
+        console.error(`[Like] Unknown error liking post ${postId}`);
+        toast("Error liking post");
       }
-    } catch (error) {
-      console.error("Error liking post:", error);
-      toast("Something went wrong. Please try again.");
+      return;
     }
-  };
+
+    const data = await response.json();
+    console.log(
+      `[Like] Post ${postId} ${data.liked ? "liked" : "unliked"} successfully. Total likes: ${data.likesCount}`
+    );
+
+    setLikedPosts((prev) => {
+      const newSet = new Set(prev);
+      if (data.liked) {
+        newSet.add(postId);
+      } else {
+        newSet.delete(postId);
+      }
+      return newSet;
+    });
+
+    toast(data.message || (data.liked ? "Post liked" : "Post unliked"));
+  } catch (error) {
+    console.error(`[Like] Error processing like/unlike for post ${postId}:`, error);
+    toast("Something went wrong. Please try again.");
+  }
+};
 
   const posts = allPosts;
 
@@ -536,8 +557,7 @@ export default function FeedPage() {
             userId={post.user.id}
             likedPosts={likedPosts}
             nextImage={nextImage}
-            prevImage={prevImage}
-          />
+            prevImage={prevImage}/>
         );
       })}
     </InfiniteScroll>

@@ -137,7 +137,7 @@
 
 "use client"
 
-import { useEffect, useState, KeyboardEvent } from "react"
+import { useState, KeyboardEvent } from "react"
 import Link from "next/link"
 import { Avatar, AvatarFallback, AvatarImage } from "../../../components/ui/avatar"
 import { Button } from "../../../components/ui/button"
@@ -249,4 +249,3 @@ export function Navbar() {
     </div>
   )
 }
-

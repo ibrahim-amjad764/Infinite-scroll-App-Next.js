@@ -145,12 +145,12 @@ const EditProfileForm = ({ user, onSave, onCancel, isSaving }: EditProfileFormPr
 
 
   return (
-    <Card className="p-6 bg-white backdrop-blur-lg shadow-lg rounded-lg border-3xl border-gray-100">
+    <Card className="p-6 bg-white backdrop-blur-lg shadow-lg rounded-lg border-4 border-gray-100 dark:border-white dark:bg-zinc-900/80 dark:border-zinc-700/50">
       <div className="flex flex-col gap-5">
         {/* Avatar */}
         <div className="flex flex-col gap-2">
-          <label className="block text-sm font-semibold text-black">Profile picture</label>
-          <div className="flex items-center gap-3 ">
+          <label className="block text-sm font-semibold text-black dark:text-white">Profile picture</label>
+          <div className="flex items-center gap-3 border-2 rounded-md dark:border-gray-600 hover:border-blue-500 transition-colors duration-200">
             <Input
               type="file"
               accept="image/*"
@@ -173,7 +173,7 @@ const EditProfileForm = ({ user, onSave, onCancel, isSaving }: EditProfileFormPr
         {/* Name */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-semibold text-black ">First name *</label>
+            <label className="block text-sm font-semibold text-black dark:text-white ">First Name *</label>
             <Input
               type="text"
               name="firstName"
@@ -181,10 +181,10 @@ const EditProfileForm = ({ user, onSave, onCancel, isSaving }: EditProfileFormPr
               onChange={handleChange}
               onBlur={handleBlur}
               placeholder="First name"
-              className="border-zinc-900/30 placeholder:text-slate-700 placeholder:opacity-60" />
+              className=" text-l border-zinc-900/30 placeholder:text-slate-700 placeholder:opacity-60 dark:text-gray-400  rounded-md dark:border-gray-600" />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-black">Last name *</label>
+            <label className="block text-sm font-semibold text-black dark:text-white">Last Name *</label>
             <Input
               type="text"
               name="lastName"
@@ -192,14 +192,14 @@ const EditProfileForm = ({ user, onSave, onCancel, isSaving }: EditProfileFormPr
               onChange={handleChange}
               onBlur={handleBlur}
               placeholder="Last name"
-              className="border-zinc-900/30 placeholder:text-slate-600" />
+              className="border-zinc-900/30 placeholder:text-slate-600 dark:text-gray-400  rounded-md dark:border-gray-600" />
           </div>
         </div>
 
         {/* Job & Company */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-semibold text-black">Job title </label>
+            <label className="block text-sm font-semibold text-black dark:text-white ">Job title </label>
             <Input
               type="text"
               name="jobTitle"
@@ -207,10 +207,10 @@ const EditProfileForm = ({ user, onSave, onCancel, isSaving }: EditProfileFormPr
               onChange={handleChange}
               onBlur={handleBlur}
               placeholder="Senior Product Designer"
-              className="border-zinc-900/30 placeholder:text-slate-600" />
+              className="border-zinc-900/30 placeholder:text-slate-600 dark:text-white rounded-md dark:border-gray-600" />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-black">Company</label>
+            <label className="block text-sm font-semibold text-black dark:text-white">Company</label>
             <Input
               type="text"
               name="company"
@@ -218,13 +218,13 @@ const EditProfileForm = ({ user, onSave, onCancel, isSaving }: EditProfileFormPr
               onChange={handleChange}
               onBlur={handleBlur}
               placeholder="Acme Inc."
-              className="border-zinc-900/30 placeholder:text-slate-600" />
+              className="border-zinc-900/30 placeholder:text-slate-600 rounded-md dark:border-gray-600" />
           </div>
         </div>
 
         {/* Bio */}
         <div>
-          <label className="block text-sm font-semibold text-black">Short bio *</label>
+          <label className="block text-sm font-semibold text-black dark:text-white">Short bio *</label>
           <Textarea
             name="bio"
             value={updatedUser.bio ?? ""}
@@ -232,13 +232,13 @@ const EditProfileForm = ({ user, onSave, onCancel, isSaving }: EditProfileFormPr
             onBlur={handleBlur}
             placeholder="Tell people a bit about you..."
             rows={1}
-            className="resize-none border-zinc-900/30 placeholder:text-slate-600" />
+            className="resize-none border-zinc-900/30 placeholder:text-slate-600 rounded-md dark:border-gray-600" />
         </div>
 
         {/* Contact + location */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-semibold text-black">Email *</label>
+            <label className="block text-sm font-semibold text-black dark:text-white">Email *</label>
             <Input
               type="email"
               name="email"
@@ -246,13 +246,13 @@ const EditProfileForm = ({ user, onSave, onCancel, isSaving }: EditProfileFormPr
               onChange={handleChange}
               onBlur={handleBlur}
               placeholder="name@example.com"
-              className="border-zinc-900/30 placeholder:text-slate-600" />
+              className="border-zinc-900/30 placeholder:text-slate-600 rounded-md dark:border-gray-600" />
             {touched.email && errors.email && (
               <p className="text-xs text-red-600 mt-1">{errors.email}</p>
             )}
           </div>
           <div>
-            <label className="block text-sm font-semibold text-black">Phone *</label>
+            <label className="block text-sm font-semibold text-black dark:text-white ">Phone *</label>
             <Input
               type="tel"
               name="phone"
@@ -260,10 +260,10 @@ const EditProfileForm = ({ user, onSave, onCancel, isSaving }: EditProfileFormPr
               onChange={handleChange}
               onBlur={handleBlur}
               placeholder="+92..."
-              className="border-zinc-900/30 placeholder:text-slate-600" />
+              className="border-zinc-900/30 placeholder:text-slate-600 rounded-md dark:border-gray-600" />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-black">Location </label>
+            <label className="block text-sm font-semibold text-black dark:text-white">Location </label>
             <Input
               type="text"
               name="location"
@@ -271,10 +271,10 @@ const EditProfileForm = ({ user, onSave, onCancel, isSaving }: EditProfileFormPr
               onChange={handleChange}
               onBlur={handleBlur}
               placeholder="City, Country"
-              className="border-zinc-900/30 placeholder:text-slate-600" />
+              className="border-zinc-900/30 placeholder:text-slate-600 rounded-md dark:border-gray-600" />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-black">Website </label>
+            <label className="block text-sm font-semibold text-black dark:text-white">Website </label>
             <Input
               type="url"
               name="website"
@@ -282,7 +282,7 @@ const EditProfileForm = ({ user, onSave, onCancel, isSaving }: EditProfileFormPr
               onChange={handleChange}
               onBlur={handleBlur}
               placeholder="https://..."
-              className="border-zinc-900/30 placeholder:text-slate-600" />
+              className="border-zinc-900/30 placeholder:text-slate-600 rounded-md dark:border-gray-600" />
             {touched.website && errors.website && (
               <p className="text-xs text-red-600 mt-1">{errors.website}</p>
             )}
@@ -292,7 +292,7 @@ const EditProfileForm = ({ user, onSave, onCancel, isSaving }: EditProfileFormPr
         {/* Social links */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-semibold text-black">GitHub </label>
+            <label className="block text-sm font-semibold text-black dark:text-white">GitHub </label>
             <Input
               type="url"
               name="github"
@@ -300,13 +300,13 @@ const EditProfileForm = ({ user, onSave, onCancel, isSaving }: EditProfileFormPr
               onChange={handleChange}
               onBlur={handleBlur}
               placeholder="https://github.com/username"
-              className="border-zinc-900/30 placeholder:text-slate-600" />
+              className="border-zinc-900/30 placeholder:text-slate-600 rounded-md dark:border-gray-600" />
             {touched.github && errors.github && (
               <p className="text-xs mt-1 text-gray-200">{errors.github}</p>
             )}
           </div>
           <div>
-            <label className="block text-sm font-semibold text-black">LinkedIn </label>
+            <label className="block text-sm font-semibold text-black dark:text-white">LinkedIn </label>
             <Input
               type="url"
               name="linkedin"
@@ -314,13 +314,13 @@ const EditProfileForm = ({ user, onSave, onCancel, isSaving }: EditProfileFormPr
               onChange={handleChange}
               onBlur={handleBlur}
               placeholder="https://linkedin.com/in/username"
-              className="border-zinc-900/30 placeholder:text-slate-600" />
+              className="border-zinc-900/30 placeholder:text-slate-600 rounded-md dark:border-gray-600" />
             {touched.linkedin && errors.linkedin && (
               <p className="text-xs text-red-600 mt-1">{errors.linkedin}</p>
             )}
           </div>
           <div>
-            <label className="block text-sm font-semibold text-black">Twitter/X </label>
+            <label className="block text-sm font-semibold text-black dark:text-white">Twitter/X </label>
             <Input
               type="url"
               name="twitter"
@@ -328,7 +328,7 @@ const EditProfileForm = ({ user, onSave, onCancel, isSaving }: EditProfileFormPr
               onChange={handleChange}
               onBlur={handleBlur}
               placeholder="https://x.com/username"
-              className="border-zinc-900/30 placeholder:text-slate-600" />
+              className="border-zinc-900/30 placeholder:text-slate-600 rounded-md dark:border-gray-600" />
             {touched.twitter && errors.twitter && (
               <p className="text-xs text-red-600 mt-1">{errors.twitter}</p>
             )}
@@ -338,7 +338,7 @@ const EditProfileForm = ({ user, onSave, onCancel, isSaving }: EditProfileFormPr
         {/* Skills / Hobbies */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-semibold text-black">Skills </label>
+            <label className="block text-sm font-semibold text-black dark:text-white">Skills </label>
             <Input
               type="text"
               name="skillsText"
@@ -346,10 +346,10 @@ const EditProfileForm = ({ user, onSave, onCancel, isSaving }: EditProfileFormPr
               onChange={handleChange}
               onBlur={handleBlur}
               placeholder="React, Next.js, SQL"
-              className="border-zinc-900/30 placeholder:text-slate-600" />
+              className="border-zinc-900/30 placeholder:text-slate-600 rounded-md dark:border-gray-600" />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-black">Hobbies </label>
+            <label className="block text-sm font-semibold text-black dark:text-white">Hobbies </label>
             <Input
               type="text"
               name="hobbiesText"
@@ -357,7 +357,7 @@ const EditProfileForm = ({ user, onSave, onCancel, isSaving }: EditProfileFormPr
               onChange={handleChange}
               onBlur={handleBlur}
               placeholder="Cricket, Reading"
-              className="border-zinc-900/30 placeholder:text-slate-600" />
+              className="border-zinc-900/30 placeholder:text-slate-600 rounded-md dark:border-gray-600" />
           </div>
         </div>
 
@@ -367,7 +367,8 @@ const EditProfileForm = ({ user, onSave, onCancel, isSaving }: EditProfileFormPr
             type="button"
             variant="outline"
             onClick={onCancel}
-            disabled={isSaving || uploadingAvatar}>
+            disabled={isSaving || uploadingAvatar}
+            className="transition-all duration-300 ease-in-out transform hover:scale-105 shadow-md">
             Cancel
           </Button>
           <Button

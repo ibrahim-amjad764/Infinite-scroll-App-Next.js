@@ -76,13 +76,13 @@ const ProfileDropdown = ({ trigger, defaultOpen, align = "end" }: Props) => {
 
         <DropdownMenuGroup>
           <DropdownMenuItem asChild>
-            <Link href="/profile" className="px-4 py-2.5 text-base flex items-center cursor-pointer">
+            <Link href="/profile" className="px-4 py-2.5 text-base flex items-center cursor-pointer transition-all duration-200 ease-in-out hover:scale-95 active:scale-95">
               <UserIcon className="text-foreground size-5 mr-2" />
               My account
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link href="/profile/edit" className="px-4 py-2.5 text-base flex items-center cursor-pointer">
+            <Link href="/profile/edit" className="px-4 py-2.5 text-base flex items-center cursor-pointer transition-all duration-200 ease-in-out hover:scale-95 active:scale-95">
               <SettingsIcon className="text-foreground size-5 mr-2" />
               Edit profile
             </Link>
@@ -92,8 +92,9 @@ const ProfileDropdown = ({ trigger, defaultOpen, align = "end" }: Props) => {
         <DropdownMenuSeparator />
 
         <DropdownMenuItem
-          // variant="destructive"
-          className="px-4 py-2.5 text-base cursor-pointer"
+          className="flex items-center px-4 py-2.5 text-base text-red-500 cursor-pointer
+             hover:text-red-900 transition-all duration-200 ease-in-out
+             hover:scale-105 active:scale-95"
           onClick={handleLogout}
         >
           <LogOutIcon className="size-5 mr-2" />

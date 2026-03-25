@@ -177,7 +177,7 @@ const LoginForm = () => {
                 <Checkbox id="remember" />
                 <span>Remember me</span>
               </label>
-              <a href="/auth/forgot-password" className="hover:underline">
+              <a href="/auth/forgot-password" className="hover:underline transition-all duration-200 ease-in-out hover:scale-105 active:scale-95">
                 Forgot password?
               </a>
             </div>
@@ -185,7 +185,7 @@ const LoginForm = () => {
             {/* Submit button */}
             <Button
               type="submit" disabled={loading}
-              className="w-full bg-linear-to-r from-gray-600 to-gray-800 rounded-full py-3  text-white font-semibold tracking-wide hover:brightness-125 transition disabled:opacity-60"
+              className="w-full bg-linear-to-r from-gray-600 to-gray-800 rounded-full py-3  text-white font-semibold tracking-wide hover:brightness-125 transition-all duration-200 ease-in-out hover:scale-105 active:scale-95 disabled:opacity-60"
             >
               {loading ? "Logging in..." : "LOGIN"}
             </Button>

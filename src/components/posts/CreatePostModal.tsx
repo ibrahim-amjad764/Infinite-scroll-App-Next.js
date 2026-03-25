@@ -203,7 +203,7 @@ export function CreatePostModal({ open, onClose, onSuccess }: Props) {
       
       <DialogHeader>
   <DialogTitle>
-    <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
+    <h2 className="text-l text-center italic font-semibold text-zinc-900 dark:text-zinc-100">
       Create Post
     </h2>
   </DialogTitle>
@@ -215,7 +215,7 @@ export function CreatePostModal({ open, onClose, onSuccess }: Props) {
         value={content}
         onChange={handleChange}
         rows={4}
-        className="bg-gray-200 dark:bg-zinc-700 border border-zinc-300 dark:border-zinc-700 focus-visible:ring-2 focus-visible:ring-blue-500 text-zinc-850 dark:text-zinc-100 placeholder:text-zinc-500 dark:placeholder:text-zinc-400 "/>
+        className="bg-gray-200 dark:bg-zinc-700 border border-zinc-300 dark:border-zinc-700 focus-visible:ring-2 focus-visible:ring-blue-500 text-zinc-300 dark:text-zinc-100 placeholder:text-zinc-500 dark:placeholder:text-zinc-400 "/>
 
       <input
         type="file"
@@ -228,13 +228,13 @@ export function CreatePostModal({ open, onClose, onSuccess }: Props) {
       {/* Image Carousel */}
       {sanitizedImages.length > 0 && (
         <div className="flex justify-center items-center mt-4">
-          <Button
+          {/* <Button
             variant="secondary"
             onClick={prevImage}
             disabled={activeIndex === 0}
             className="mr-2 dark:bg-zinc-800 dark:hover:bg-zinc-700">
             &lt;
-          </Button>
+          </Button> */}
 
           <div className="relative w-64 h-64 rounded-lg overflow-hidden border border-zinc-300 dark:border-zinc-700">
             <Image
@@ -244,13 +244,13 @@ export function CreatePostModal({ open, onClose, onSuccess }: Props) {
               className="object-cover" />
           </div>
 
-          <Button
+          {/* <Button
             variant="secondary"
             onClick={nextImage}
             disabled={activeIndex === sanitizedImages.length - 1}
             className="ml-2 dark:bg-zinc-800 dark:hover:bg-zinc-700 ">
             &gt;
-          </Button>
+          </Button> */}
         </div>
       )}
 
@@ -263,7 +263,7 @@ export function CreatePostModal({ open, onClose, onSuccess }: Props) {
             alt={`Post image ${i + 1}`}
             width={80}
             height={80}
-            className="rounded-md object-cover border border-zinc-300 dark:border-zinc-700"/>
+            className="rounded-md object-cover border border-zinc-300 dark:border-zinc-700 "/>
         ))}
 
         {uploadingImages.map((img, i) => (

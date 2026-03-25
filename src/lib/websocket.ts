@@ -3,88 +3,261 @@ import { AppDataSource } from '@/db/data-source';
 import { Comment } from '@/entities/comment';
 import { Post } from '@/entities/post';
 import { User } from '@/entities/user';
+import 'dotenv/config';
 
-let wss: WebSocketServer;
+// --- Add this interface at the top ---
+interface NotificationPayload {
+  id: string;
+  message: string;
+  read: boolean;
+  createdAt: string;
+  sender?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+  };
+  type: string;
+  postId?: string;
+}
 
-export function setupWebSocketServer(server: any) {
-  wss = new WebSocketServer({ server });
+// ==========================
+// ✅ DATABASE INITIALIZATION (from file 2 - SAFE ADD)
+// ==========================
+console.log('[WebSocket] Starting WebSocket server...');
 
-  wss.on('connection', (ws: WebSocket) => {
-    console.log('New client connected');
+let db;
+try {
+  db = AppDataSource;
 
-    ws.on('message', async (message: string) => {
-      console.log("Received message:", message); // Log the incoming message
+  if (!db) {
+    throw new Error('Database not initialized');
+  }
 
+  if (!db.isInitialized) {
+    await db.initialize();
+    console.log('[WebSocket] Database initialized');
+  }
+
+  console.log('[WebSocket] Database connected successfully');
+} catch (error) {
+  console.error('[WebSocket] Database connection failed:', error);
+  process.exit(1);
+}
+
+// ==========================
+// ✅ MULTI-DEVICE SUPPORT (already in file 1)
+// ==========================
+const connectedUsers: Record<string, WebSocket[]> = {};
+
+// ==========================
+// ✅ SERVER CONFIG (enhanced)
+// ==========================
+export const wss = new WebSocketServer({
+  port: 3001,
+  perMessageDeflate: false // performance optimization
+});
+
+console.log('[WebSocket] Server started on ws://localhost:3001');
+
+// ==========================
+// ✅ BROADCAST FUNCTION (from file 2 - reusable + scalable)
+// ==========================
+const broadcast = (message: any) => {
+  const payload = JSON.stringify(message);
+  let count = 0;
+
+  wss.clients.forEach((client: WebSocket) => {
+    if (client.readyState === WebSocket.OPEN) {
       try {
-        const { postId, content, userId } = JSON.parse(message);
+        client.send(payload);
+        count++;
+      } catch (err: any) {
+        console.error('[WebSocket] Broadcast error:', err.message);
+      }
+    }
+  });
 
-        // Validate required fields
-        if (!postId || !content || !userId) {
-          console.log("Missing required fields: postId, content, or userId");
-          return;
-        }
+  console.log(`[WebSocket] Broadcast sent to ${count} clients`);
+};
 
-        const commentRepo = AppDataSource!.getRepository(Comment);
-        const postRepo = AppDataSource!.getRepository(Post);
-        const userRepo = AppDataSource!.getRepository(User);
+// ==========================
+// ✅ SAVE COMMENT FUNCTION (clean architecture)
+// ==========================
+const saveComment = async (postId: string, content: string, userId: string) => {
+  try {
+    const commentRepo = db.getRepository(Comment);
+    const postRepo = db.getRepository(Post);
+    const userRepo = db.getRepository(User);
 
-        // Ensure that the post and user exist before creating a comment
-        const post = await postRepo.findOneBy({ id: postId });
-        const user = await userRepo.findOneBy({ id: userId });
+    const post = await postRepo.findOne({ where: { id: postId } });
+    if (!post) throw new Error('Post not found');
 
-        if (!post) {
-          console.log(`[WebSocket] Post not found with ID ${postId}`);
-          ws.send(JSON.stringify({ error: `Post with ID ${postId} not found` }));
-          return;
-        }
+    const user = await userRepo.findOne({ where: { id: userId } });
+    if (!user) throw new Error('User not found');
 
-        if (!user) {
-          console.log(`[WebSocket] User not found with ID ${userId}`);
-          ws.send(JSON.stringify({ error: `User with ID ${userId} not found` }));
-          return;
-        }
+    const comment = new Comment();
+    comment.content = content.trim();
+    comment.post = post;
+    comment.user = user;
+    comment.createdAt = new Date();
 
-        // Create new comment
-        const newComment = new Comment();
-        newComment.post = post;
-        newComment.user = user;
-        newComment.content = content;
+    const saved = await commentRepo.save(comment);
 
-        // Save the comment to the database
-        const savedComment = await commentRepo.save(newComment);
-        console.log(`[WebSocket] Saved comment: ${savedComment.id}`);
+    console.log('[WebSocket] Comment saved:', saved.id);
 
-        // Broadcast the new comment to all connected clients
-        wss.clients.forEach((client: WebSocket) => {
-          if (client.readyState === WebSocket.OPEN) { // Ensure the connection is open
-            client.send(JSON.stringify({
-              postId,
-              content,
-              userId,
-              commentId: savedComment.id,
-              createdAt: savedComment.createdAt,
-              user: {
-                firstName: user.firstName,
-                lastName: user.lastName,
-              },
-            }));
-          }
+    return {
+      id: saved.id,
+      content: saved.content,
+      postId,
+      userId,
+      createdAt: saved.createdAt,
+      user: {
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        avatarUrl: user.avatarUrl
+      }
+    };
+  } catch (error: any) {
+    console.error('[WebSocket] saveComment error:', error.message);
+    throw error;
+  }
+};
+
+// ==========================
+// ✅ CONNECTION HANDLER
+// ==========================
+wss.on('connection', (ws: WebSocket, req: any) => {
+
+  const urlParams = new URLSearchParams(req.url?.split("?")[1]);
+  const userId = urlParams.get("userId");
+
+  if (!userId) {
+    console.log('[WebSocket] Connection rejected: Missing userId');
+    return ws.close();
+  }
+
+  // MULTI DEVICE SUPPORT
+  if (!connectedUsers[userId]) connectedUsers[userId] = [];
+  connectedUsers[userId].push(ws);
+
+  console.log(`[WebSocket] User ${userId} connected`);
+
+  // ✅ SEND WELCOME MESSAGE (from file 2)
+  ws.send(JSON.stringify({
+    type: 'connection',
+    status: 'connected',
+    userId,
+    message: 'Connected to WebSocket server',
+    timestamp: new Date().toISOString()
+  }));
+
+  ws.on('close', () => {
+    connectedUsers[userId] = connectedUsers[userId].filter((s) => s !== ws);
+    console.log(`[WebSocket] User ${userId} disconnected`);
+  });
+
+  ws.on('error', (err: any) => {
+    console.error(`[WebSocket] Error for user ${userId}:`, err.message);
+  });
+
+  // ==========================
+  // ✅ MESSAGE HANDLER (MERGED LOGIC)
+  // ==========================
+  ws.on('message', async (message: string) => {
+    console.log(`[WebSocket] Received from ${userId}:`, message);
+
+    try {
+      const parsed = JSON.parse(message);
+      const { postId, content, type } = parsed;
+
+      // ✅ SUPPORT BOTH FORMATS (IMPORTANT FIX)
+      const finalType = type || 'comment';
+
+      if (finalType === 'comment' && postId && content) {
+
+        // SAVE COMMENT
+        const savedComment = await saveComment(postId, content, userId);
+
+        // BROADCAST
+        broadcast({
+          type: 'new_comment',
+          comment: savedComment,
+          timestamp: new Date().toISOString()
         });
 
-        console.log(`New comment added: ${savedComment.id}`);
-      } catch (error) {
-        console.error('Error processing message:', error);
-        // Notify the client in case of error
-        ws.send(JSON.stringify({ error: "An error occurred while processing your comment" }));
+        // CONFIRMATION
+        ws.send(JSON.stringify({
+          type: 'comment_saved',
+          success: true,
+          commentId: savedComment.id,
+          timestamp: new Date().toISOString()
+        }));
+
+        // ==========================
+        // ✅ NOTIFICATIONS (from file 1)
+        // ==========================
+        const postRepo = db.getRepository(Post);
+        const post = await postRepo.findOne({ where: { id: postId }, relations: ['user'] });
+
+        if (post && post.user.id !== userId) {
+          pushNotificationToUser(post.user.id, {
+            id: `notif-${savedComment.id}`,
+            message: `${savedComment.user.firstName || 'Someone'} commented on your post`,
+            read: false,
+            createdAt: new Date().toISOString(),
+            sender: {
+              id: savedComment.user.id,
+              firstName: savedComment.user.firstName || 'User',
+              lastName: savedComment.user.lastName || '',
+            },
+            type: "COMMENT",
+            postId: post.id,
+          });
+        }
+
+      } else {
+        console.log('[WebSocket] Invalid message format');
+        ws.send(JSON.stringify({
+          type: 'error',
+          message: 'Invalid message format'
+        }));
       }
-    });
 
-    ws.on('close', () => {
-      console.log('Client disconnected');
-    });
+    } catch (error: any) {
+      console.error('[WebSocket] Message error:', error.message);
+      ws.send(JSON.stringify({
+        type: 'error',
+        message: error.message
+      }));
+    }
   });
+});
+
+// ==========================
+// ✅ NOTIFICATION FUNCTION (UNCHANGED)
+// ==========================
+export function pushNotificationToUser(userId: string, notification: NotificationPayload) {
+  const sockets = connectedUsers[userId] || [];
+
+  sockets.forEach((ws: WebSocket) => {
+    if (ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify(notification));
+    }
+  });
+
+  console.log(`[WebSocket] Notification sent to ${userId}`, notification);
 }
 
-export function getWebSocketServer() {
-  return wss;
-}
+// ==========================
+// ✅ GRACEFUL SHUTDOWN (from file 2)
+// ==========================
+process.on('SIGINT', () => {
+  console.log('[WebSocket] Shutting down...');
+  wss.close(() => {
+    console.log('[WebSocket] Server closed');
+    process.exit(0);
+  });
+});
+
+console.log('[WebSocket] Server ready ');

@@ -22,13 +22,10 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-
-  // **Webpack Customization (if needed)**
-  webpack: (config, { dev }) => {
-    if (dev) {
-      console.log("[next.config.js] Using Webpack instead of Turbopack for development");
-    }
-    return config;
+  
+  // Use Turbopack for development and production
+  turbopack: {
+    // Add any Turbopack configuration here if needed
   },
 };
 

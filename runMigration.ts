@@ -7,8 +7,8 @@ import { Comment } from "./src/entities/comment";
 import { AppDataSource } from "./src/db/data-source"; // Make sure this path is correct!
 
 async function run() {
-  await AppDataSource.initialize();
-  await AppDataSource.runMigrations();
+  await AppDataSource!.initialize();
+  await AppDataSource!.runMigrations();
   console.log("Migrations have been run successfully!");
 }
 

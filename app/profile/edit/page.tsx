@@ -51,18 +51,18 @@ const EditProfilePage = () => {
   if (!user) return <Loader title="Loading form..." subtitle="Preparing your profile data" size="md" />;
 
   return (
-    <div className="min-h-screen bg-slate-200 text-gray-800">
-      <div className="max-w-4xl mx-auto px-4 py-10 space-y-6">
+    <div className="min-h-screen bg-slate-200 text-gray-800 dark:bg-zinc-900 dark:text-gray-300">
+      <div className="max-w-4xl mx-auto px-4 py-10 space-y-6 ">
         {/* Back button */}
         <div>
-          <Button variant="outline" asChild className="transition-all duration-200 ease-in-out hover:scale-105 active:scale-95">
+          <Button variant="outline" asChild className="dark:bg-zinc-900 dark:hover:bg-zinc-700 transition-all duration-200 ease-in-out hover:scale-105 active:scale-95 text-md">
             <Link href="/profile">← Back</Link>
           </Button>
         </div>
 
         <div>
           <h2 className="text-2xl font-semibold ">Edit profile</h2>
-          <p className="text-sm text-slate-600 mt-2 italic ">
+          <p className="text-sm text-slate-400 mt-2 italic ">
             Personal, Account, Security & Notifications. Changes reflect on your profile page.
           </p>
         </div>

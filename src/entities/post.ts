@@ -3,9 +3,14 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, On
 import type { User } from "./user";
 import type { Like } from "./like";
 import type { Comment } from "./comment";
+import { Notification } from "./notification";
 
 @Entity("posts")
 export class Post {
+
+  // @OneToMany(() => Notification, (notification) => notification.post)
+  notifications: Notification[] = []; 
+
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 

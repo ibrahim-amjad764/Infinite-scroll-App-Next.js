@@ -8,6 +8,7 @@ import { Like } from "../../../src/entities/like";
 import { Comment } from "../../../src/entities/comment";
 import { User } from "../../../src/entities/user";
 import { cookies } from "next/headers";
+import { In } from "typeorm";
 
 // Helper: Get authenticated user
 async function getAuthUser(): Promise<User | null> {
@@ -41,7 +42,6 @@ async function getAuthUser(): Promise<User | null> {
 }
 
 // --- GET: fetch posts with likes & comments info ---
-import { In } from "typeorm";
 
 export async function GET(req: Request) {
   const startTime = Date.now();
@@ -52,6 +52,7 @@ export async function GET(req: Request) {
     const page = Math.max(1, parseInt(searchParams.get("page") || "1"));
     const limit = Math.max(1, parseInt(searchParams.get("limit") || "5"));
     const mine = searchParams.get("mine") === "1";
+    const userIdParam = searchParams.get("userId");
     const skip = (page - 1) * limit;
 
     await initDB();
@@ -63,14 +64,26 @@ export async function GET(req: Request) {
     const likeRepo = AppDataSource.getRepository(Like);
     const commentRepo = AppDataSource.getRepository(Comment);
 
-    const currentUser = await getAuthUser();
-    if (!currentUser) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    // if client is requesting posts for a specific user we allow public access;
+    // otherwise enforce authentication for `mine` or global feeds.
+    let currentUser: User | null = null;
+    if (!userIdParam) {
+      currentUser = await getAuthUser();
+      if (!currentUser) {
+        return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+      }
+    } else {
+      // we still try to resolve the auth user so we can supply `isLikedByUser`
+      currentUser = await getAuthUser();
     }
 
-    const whereClause = mine
-      ? { user: { email: currentUser.email } }
-      : undefined;
+    // build filtering clause
+    let whereClause: any = undefined;
+    if (userIdParam) {
+      whereClause = { user: { id: userIdParam } };
+    } else if (mine) {
+      whereClause = { user: { email: currentUser?.email } };
+    }
 
     const posts = await postRepo.find({
       where: whereClause,
@@ -95,7 +108,7 @@ export async function GET(req: Request) {
       string,
       { id: string; firstName?: string; avatarUrl?: string }[]
     > = {};
-
+    //every like is in loop & get post id & add like to array of post id
     likes.forEach((like) => {
       const postId = like.post.id;
 
@@ -122,7 +135,7 @@ export async function GET(req: Request) {
         user: { id: string; firstName?: string; avatarUrl?: string };
       }[]
     > = {};
-
+    //every comment  is in loop & get post id & add coment to array of post id
     comments.forEach((comment) => {
       const postId = comment.post.id;
 
@@ -139,7 +152,8 @@ export async function GET(req: Request) {
       });
     });
 
-
+    //every post is in loop &  get id & get likes & comments of post
+    //,if not exist like or comment  return empty array
     const enrichedPosts = posts.map((post) => {
       const postId = post.id;
       const likesList = likesByPost[postId] || [];
@@ -149,7 +163,7 @@ export async function GET(req: Request) {
         ...post,
         likesCount: likesList.length,
         commentsCount: commentsList.length,
-        isLikedByUser: likesList.some((l) => l.id === currentUser.id),
+        isLikedByUser: currentUser ? likesList.some((l) => l.id === currentUser!.id) : false,
         likes: likesList,
         comments: commentsList,
       };
@@ -200,8 +214,13 @@ export async function POST(req: Request) {
     if (images && !Array.isArray(images)) {
       return NextResponse.json({ error: "Images must be an array" }, { status: 400 });
     }
+    
 
     const postRepo = AppDataSource.getRepository(Post);
+// const post = await postRepo.findOne({
+//   where: { id: postId },
+//   relation: ["user"], 
+// });
 
     const newPost: Partial<Post> = {
       content: content.trim(),

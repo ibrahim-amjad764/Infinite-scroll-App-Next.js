@@ -8,6 +8,8 @@
     "dev": "node server.js",
     "build": "next build",
     "start": "node server.js",
+    "websocket": "tsx websocket-server.js",
+     "ws": "node websocket-server.js",
     "lint": "eslint"
   },
   "dependencies": {

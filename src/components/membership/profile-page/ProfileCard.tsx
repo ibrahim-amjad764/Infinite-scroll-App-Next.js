@@ -105,6 +105,7 @@
 //   );
 // }
 // export default ProfileCard;
+
 "use client";
 
 import InfiniteScroll from "react-infinite-scroll-component";
@@ -133,29 +134,50 @@ interface Post {
 }
 
 interface ProfileCardProps {
-  posts?: Post[];       // optional, default to empty
+ 
   hasMore: boolean;
+  posts?: Post[];       // optional, default to empty
   loadMore: () => void;
+}
+
+interface ProfileContentProps {
+  onSave: () => void;
+  onCancel: () => void;
+  isSaving: boolean;
 }
 
 const ProfileCard = ({ posts = [], hasMore, loadMore }: ProfileCardProps) => {
   console.log("[ProfileCard] Rendering posts:", posts);
 
+  const loadMoreWithTimeout = async () => {
+    // Minimum loader delay in ms
+    const minDelay = 2000;
+
+    const start = Date.now();
+    await loadMore(); // call actual loadMore
+    const elapsed = Date.now() - start;
+
+    // Ensure loader shows at least minDelay
+    if (elapsed < minDelay) {
+      await new Promise((res) => setTimeout(res, minDelay - elapsed));
+    }
+  };
+
   return (
     <div className="w-full px-3 sm:px-4 md:px-6">
       <div className="w-full max-w-2xl mx-auto space-y-6">
-        <h3 className="text-xl sm:text-2xl font-semibold text-slate-800">
+        <h3 className="text-xl sm:text-2xl font-semibold text-slate-800 dark:text-gray-300">
           My Posts ({posts.length})
         </h3>
 
         {posts.length === 0 && (
-          <p className="text-center text-gray-400 text-sm">No posts yet.</p>
+          <p className="text-center text-gray-400 text-m italic">No posts yet.</p>
         )}
 
         {posts.length > 0 && (
           <InfiniteScroll
             dataLength={posts.length}
-            next={loadMore}
+            next={loadMoreWithTimeout} // use the wrapper
             hasMore={hasMore}
             scrollThreshold={0.9}
             loader={
@@ -173,10 +195,10 @@ const ProfileCard = ({ posts = [], hasMore, loadMore }: ProfileCardProps) => {
               {posts.map((post) => (
                 <Card
                   key={post.id}
-                  className="p-4 bg-white border border-gray-200 shadow-sm w-full overflow-hidden"
+                  className="p-4 bg-white border border-gray-200 shadow-sm w-full overflow-hidden dark:bg-zinc-800"
                 >
                   {/* Post content */}
-                  <p className="text-sm sm:text-base text-gray-700 break-words">
+                  <p className="text-sm sm:text-base text-gray-700 warp-break-words dark:text-gray-400">
                     {post.content}
                   </p>
 
@@ -192,12 +214,12 @@ const ProfileCard = ({ posts = [], hasMore, loadMore }: ProfileCardProps) => {
                   ) : null}
 
                   {/* Post date */}
-                  <p className="text-xs text-gray-500 mt-2">
+                  <p className="text-xs text-gray-500 ml-130">
                     {new Date(post.createdAt).toLocaleString()}
                   </p>
 
                   {/* Likes */}
-                  <p className="font-semibold text-sm mt-2">
+                  <p className="font-semibold text-sm ">
                     Likes: {post.likesCount || 0}
                   </p>
 

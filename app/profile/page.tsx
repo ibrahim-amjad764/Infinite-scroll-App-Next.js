@@ -272,7 +272,7 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 text-gray-900">
+    <div className="min-h-screen bg-slate-100 text-gray-900 dark:bg-zinc-950">
       <div className="w-full px-10 py-10 space-y-6">
         <div className="bg-gray-500/10 rounded-lg shadow-md p-6 space-y-4">
           <ProfileHeader user={user} onEdit={handleEditProfile} showEditButton />

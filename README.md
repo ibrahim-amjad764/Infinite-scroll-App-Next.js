@@ -69,13 +69,14 @@ This project demonstrates **real-world auth patterns**, **secure session handlin
 ---
 
 ## 📁 Project Structure
-NEXT-TYPEORM-POSTGRES/
+
+```
+next-typeorm-postgres/
 │
 ├── .next/
 ├── node_modules/
 ├── dist/
 ├── public/
-├── path/
 │
 ├── .env.local
 ├── .gitignore
@@ -88,12 +89,14 @@ NEXT-TYPEORM-POSTGRES/
 ├── package.json
 ├── package-lock.json
 ├── postcss.config.mjs
-├── tailwind.config.js
-├── server.js
 ├── runMigration.ts
+├── server.js
+├── tailwind.config.js
 ├── tsconfig.json
 ├── tsconfig.cli.json
+├── tsconfig.migrations.json
 ├── tsconfig.tsbuildinfo
+├── websocket-server.js
 │
 ├── app/
 │   ├── api/
@@ -107,7 +110,18 @@ NEXT-TYPEORM-POSTGRES/
 │   │   │   └── signup/
 │   │   │       └── route.ts
 │   │   │
+│   │   ├── notifications/
+│   │   │   ├── route.ts
+│   │   │   ├── mark-read/
+│   │   │   │   └── route.ts
+│   │   │   └── unread-count/
+│   │   │       └── route.ts
+│   │   │
 │   │   ├── posts/
+│   │   │   ├── [id]/
+│   │   │   │    └── route.ts
+│   │   │   ├── feed/
+│   │   │   │    └── route.ts
 │   │   │   ├── comment/
 │   │   │   │   └── route.ts
 │   │   │   ├── like/
@@ -115,14 +129,24 @@ NEXT-TYPEORM-POSTGRES/
 │   │   │   └── route.ts
 │   │   │
 │   │   ├── profile-user/
-│   │   │   └── route.ts
+│   │   │   ├── profile/
+│   │   │   │    └── route.ts
+│   │   │   ├── route.ts
+│   │   │   └── user.ts
 │   │   │
 │   │   ├── upload/
 │   │   │   └── route.ts
 │   │   │
 │   │   └── users/
-│   │       └── [id]/
-│   │           └── route.ts
+│   │       ├── [id]/
+│   │       │   ├── follow-status/
+│   │       │   │   └── route.ts
+│   │       │   ├── follow/
+│   │       │   │   └── route.ts
+│   │       │   ├── unfollow/
+│   │       │   │   └── route.ts
+│   │       │   └── route.ts
+│   │       └── route.ts
 │   │
 │   ├── assets/
 │   │   └── svg/
@@ -139,6 +163,8 @@ NEXT-TYPEORM-POSTGRES/
 │   │   └── page.tsx
 │   │
 │   ├── profile/
+│   │   ├── [id]/
+│   │   │   └── page.tsx
 │   │   ├── edit/
 │   │   │   └── page.tsx
 │   │   └── page.tsx
@@ -148,34 +174,50 @@ NEXT-TYPEORM-POSTGRES/
 │   ├── layout.tsx
 │   └── page.tsx
 │
-├── components/
-│
 ├── src/
-│   │
 │   ├── components/
-│   │   ├── comments/
-│   │   │   └── CommentSection.tsx
 │   │   ├── logo/
 │   │   ├── membership/
-│   │   ├── forget-page/
-│   │   │   └── forgot-password-form.tsx
-│   │   ├── login-page-02/
-│   │   │   ├── login-page-01 .tsx
-│   │   │   └── login-form.tsx
-│   │   ├── logout-page-03/
-│   │   │   └── logout-form.tsx
-│   │   ├── profile-page/
-│   │   │   ├── EditProfileForm.tsx
-│   │   │   ├── ProfileCard.tsx
-│   │   │   ├── ProfileContent.tsx
-│   │   │   └── ProfileHeader.tsx
-│   │   ├── signup-page-01/
-│   │   │   ├── signup-form.tsx
-│   │   │   └── signup-page.tsx
+│   │   │   ├── forget-page
+│   │   │   │       └── forgot-password.tsx
+│   │   │   ├── login-page-02
+│   │   │   │       └── login-from.tsx
+│   │   │   │       └── login-page-01.tsx
+│   │   │   ├── logout-page-03
+│   │   │   │       └── logout-from.tsx
+│   │   │   ├── profile-page
+│   │   │   │       └── EditProfileForm.tsx
+│   │   │   │       └── FollowButton.tsx
+│   │   │   │       └── ProfileCard.tsx
+│   │   │   │       └── ProfileContent.tsx
+│   │   │   │       └── ProfileHeader.tsx
+│   │   │   │       └── ProfilePageClient.tsx
+│   │   │   │       └── ProfileTabs.tsx
+│   │   │   │       └── UserProfileCards.tsx
+│   │   │   │       └── UserProfileSummary.tsx
+│   │   │   └── signup-page-01
+│   │   │           └── signup-form.tsx
+│   │   │           └── signup-page.tsx
 │   │   ├── navbar/
 │   │   │   └── navbar.tsx
+│   │   ├── notifications/
+│   │   │   ├── NotificationBell.tsx
+│   │   │   ├── NotificationDropdown.tsx
+│   │   │   ├── NotificationItem.tsx
+│   │   │   └── SearchBar.tsx
 │   │   ├── posts/
-│   │   │   └── CreatePostModal.tsx
+│   │   │   ├── comments/
+│   │   │   │   └── CommentSection.tsx
+│   │   │   ├── likes/
+│   │   │   │   └── LikeButton.tsx
+│   │   │   ├── Share/
+│   │   │   │   └── ShareButton.tsx
+│   │   │   ├── Shared/
+│   │   │   │   ├── BackButton.tsx
+│   │   │   │   └── LinkToUserProfile.tsx
+│   │   │   ├── CreatePostModal.tsx
+│   │   │   ├── Post.tsx
+│   │   │   └── PostItem.tsx
 │   │   └── ui/
 │   │
 │   ├── db/
@@ -187,14 +229,21 @@ NEXT-TYPEORM-POSTGRES/
 │   │   ├── comment.ts
 │   │   ├── like.ts
 │   │   ├── post.ts
+│   │   ├── follow.ts
+│   │   ├── notification.ts
 │   │   └── user.ts
 │   │
 │   ├── lib/
 │   │   ├── api.ts
+│   │   ├── auth.ts
 │   │   ├── cloudinary.ts
 │   │   ├── firebase.ts
 │   │   ├── firebase-admin.ts
 │   │   ├── utils.ts
+│   │   ├── mappers.ts
+│   │   ├── profileHelpers.ts
+│   │   ├── notificationSocket.ts
+│   │   ├── notificationWsServer.ts
 │   │   └── websocket.ts
 │   │
 │   ├── migrations/
@@ -204,9 +253,12 @@ NEXT-TYPEORM-POSTGRES/
 │   │
 │   ├── services/
 │   │   ├── auth.service.ts
+│   │   ├── follow.service.ts
+│   │   ├── notification.service.ts
 │   │   └── user.service.ts
 │   │
 │   ├── store/
+│   │   ├── notificationStore.ts
 │   │   └── useStore.ts
 │   │
 │   └── types/

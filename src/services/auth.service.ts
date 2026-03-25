@@ -16,7 +16,7 @@ export const getFirebaseToken = async () => {
   try {
     // Get a fresh token if the token is expired
     const token = await currentUser.getIdToken(true);  // 'true' forces refresh
-    console.log("Firebase Token refreshed:", token?.slice(0, 20), "...");
+    console.log("Firebase Token refreshed:", token?.slice(0, 10), "...");
     return token;
   } catch (error) {
     console.error("Error fetching Firebase token:", error);

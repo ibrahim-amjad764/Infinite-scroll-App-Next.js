@@ -4,12 +4,14 @@ import { useState } from "react";
 import { Button } from "../../../../components/ui/button";
 import { Heart } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { motion } from "framer-motion";  // Import framer-motion
 
 interface LikeButtonProps {
   postId: string;
   initialIsLiked: boolean;
   initialLikesCount: number;
   userId: string;
+   className?: string;
 }
 interface LikeButtonMutationContext {
   previousIsLiked: boolean;
@@ -29,7 +31,7 @@ export const LikeButton = ({
 
   const likeMutation = useMutation({
     mutationFn: async () => {
-      console.log(`\n[LikeButton] Sending request to server for post: ${postId}, user: ${userId}`);
+      console.log(`\n[Like] Sending request post: ${postId}, user: ${userId}`);
 
       const res = await fetch("/api/posts/like", {
         method: "POST",
@@ -40,12 +42,12 @@ export const LikeButton = ({
 
       if (!res.ok) {
         const errorText = await res.text();
-        console.error(`[LikeButton] Server responded with status ${res.status}:`, errorText);
+        console.error(`Server responded with status ${res.status}:`, errorText);
         throw new Error("Failed to update like");
       }
 
       const data = await res.json();
-      console.log(`[LikeButton] Server response for post ${postId}:`, data);
+      console.log(`Server response for post ${postId}:`, data);
       return data;
     },
 
@@ -81,21 +83,23 @@ export const LikeButton = ({
   });
 
   return (
-    <Button
-      variant="ghost"
-      size="sm"
-      onClick={() =>
-  //      {
-  // if (isLiked) {
-  //   console.log(`[LikeButton] User ${userId} already liked post ${postId}`);
-  //   return; // early exit
-  // }}
-  likeMutation.mutate()}
-  
-      disabled={likeMutation.isPending}
-      className={isLiked ? "text-red-500" : undefined}>
-      <Heart className={`h-4 w-4 mr-1 ${isLiked ? "fill-current" : ""}`} />
-      {likesCount} {likesCount === 1 ? "Like" : "Likes"}
-    </Button>
+    // <motion.div
+    //   initial={{ opacity: 0, y: 20 }}
+    //   animate={{ opacity: 1, y: 0 }}
+    //   transition={{ duration: 0.3 }}
+    // >
+    <div>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => likeMutation.mutate()}
+        disabled={likeMutation.isPending}
+        className={`${
+          isLiked ? "text-red-500" : "text-gray-800 hover:text-red-500"} dark:text-white dark:hover:text-red-500 flex items-center transition-colors duration-200 ease-in-out hover:scale-105 active:scale-95`}>
+        <Heart className={`h-4 w-4 mr-1 ${isLiked ? "fill-current" : ""}`} />
+        {likesCount} {likesCount === 1 ? "Like" : "Likes"}
+      </Button>
+      </div>
+    // </motion.div>
   );
 };

@@ -100,10 +100,11 @@ export default function ProfileContent({ user, onSave, onCancel, isSaving }: Pro
               </div>
               <Button
                 variant="destructive"
+                className="bg-red-600"
                 onClick={() => {
                   console.warn("[ProfileContent] Delete account clicked");
                   toast.error("Delete account is not implemented"); }}>
-                <Trash2 className="mr-2 h-4 w-4" />
+                <Trash2 className="mr-2 h-4 w-4 " />
                 Delete Account
               </Button>
             </div>

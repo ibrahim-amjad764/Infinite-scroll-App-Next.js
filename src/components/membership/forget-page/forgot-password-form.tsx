@@ -72,7 +72,7 @@ const ForgotPasswordForm = () => {
             <Button
               type="submit"
               disabled={loading}
-              className="w-full bg-linear-to-r from-gray-600 to-gray-800 rounded-full py-3 text-white font-semibold tracking-wide hover:brightness-125 transition disabled:opacity-60">
+              className="w-full bg-linear-to-r from-gray-600 to-gray-800 rounded-full py-3 text-white font-semibold tracking-wide hover:brightness-125 transition-all duration-200 ease-in-out hover:scale-105 active:scale-95 disabled:opacity-60">
               {loading ? "Sending..." : "Send Reset Link"}
             </Button>
 

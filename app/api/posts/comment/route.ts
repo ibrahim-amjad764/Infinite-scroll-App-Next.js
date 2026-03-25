@@ -8,6 +8,8 @@ import { User } from "../../../../src/entities/user";
 import admin from "../../../../src/lib/firebase-admin";
 import { cookies } from "next/headers";
 import { In } from "typeorm";
+import { NotificationService } from "../../../../src/services/notification.service";
+import { NotificationType } from "../../../../src/entities/notification";
 
 // Runs in Node.js environment
 export const runtime = "nodejs";
@@ -59,7 +61,7 @@ export async function GET(req: NextRequest) {
 
     const commentRepo = AppDataSource.getRepository(Comment);
 
-    let comments = [];
+    let comments: Comment[] = [];
 
     if (postId) {
       // Single post - return in original format for feed page compatibility
@@ -77,7 +79,7 @@ export async function GET(req: NextRequest) {
 
       // Return in original format to match working commented version
       return Response.json({ comments });
-      
+
     } else if (postIdsParam) {
       // Multiple posts - return flattened format for profile page
       const postIds = postIdsParam.split(",");
@@ -140,7 +142,10 @@ export async function POST(req: NextRequest) {
     const postRepo = AppDataSource.getRepository(Post);
     const commentRepo = AppDataSource.getRepository(Comment);
 
-    const post = await postRepo.findOneBy({ id: postId });
+    const post = await postRepo.findOne({
+      where: { id: postId },
+      relations: ["user"], // 🔥 THIS FIXES EVERYTHING
+    });
     if (!post) {
       console.log(`[POST /api/posts/comment] Post not found: ${postId}`);
       return Response.json({ message: "Post not found" }, { status: 404 });
@@ -152,6 +157,17 @@ export async function POST(req: NextRequest) {
     comment.content = content.trim();
 
     const savedComment = await commentRepo.save(comment);
+
+    if (post.user.id !== user.id) {
+      console.log(`[NOTIF] Sending notification to post owner ${post.user.id}`);
+      await NotificationService.createNotification({
+        recipientId: post.user.id,
+        senderId: user.id,
+        type: NotificationType.COMMENT,
+        message: `${user.firstName || "Someone"} commented on your post`,
+        postId: post.id,
+      });
+    }
 
     const commentWithUser = await commentRepo.findOne({
       where: { id: savedComment.id },
@@ -170,3 +186,4 @@ export async function POST(req: NextRequest) {
     return Response.json({ error: "Failed to add comment" }, { status: 500 });
   }
 }
+

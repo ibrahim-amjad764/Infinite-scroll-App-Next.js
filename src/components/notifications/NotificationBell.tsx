@@ -298,12 +298,12 @@ export function NotificationBell() {
        {/* Simple notification badge - WITH BOUNCE ANIMATION */}
         {unreadCount > 0 && (
           <span
-            className={`absolute -top-1.5 -right-1.5 min-w-[20px] h-5 text-xs font-bold bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-full flex items-center justify-center px-1.5 shadow-lg transition-all duration-300 ${
-              bounce || continuousBounce ? "animate-premium-bounce" : ""
+            className={`absolute -top-1.5 -right-1.5 min-w-[20px] h-5 text-xs font-bold bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-full flex items-center justify-center px-1.5 shadow-lg transition-all duration-300  ${
+              bounce || continuousBounce ? "slow-bounce" : ""
             }`}
-            style={{
-              animation: (bounce || continuousBounce) ? 'premium-bounce 6s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite' : 'none'
-            }}
+            // style={{
+            //   animation: (bounce || continuousBounce) ? 'premium-bounce 6s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite' : 'none'
+            // }}
             role="status"
             aria-label={`${unreadCount} unread notifications`}
          >
@@ -317,47 +317,7 @@ export function NotificationBell() {
         )}
       </button>
 
-     {/* Always visible debug test button */}
-      {/* <button
-        className="mt-2 px-3 py-1 bg-red-500 text-white rounded text-xs"
-        onClick={() => {
-          console.log("[NotificationBell] 🔥 DEBUG: Triggering animations!");
-          setBounce(true);
-          setShake(true);
-          setPulse(true);
-          setTimeout(() => {
-            setBounce(false);
-            setShake(false);
-            setPulse(false);
-           console.log("[NotificationBell] 🔥 DEBUG: Animations reset");
-          }, 2000);
-        }}
-      >
-        DEBUG Animations
-     </button>
-
-
-      <div className="mt-2 flex gap-2">
-        <button
-         className="px-2 py-1 bg-blue-500 text-white rounded text-xs"
-          onClick={() => {
-            setContinuousShake(!continuousShake);
-            console.log("[NotificationBell] 🔄 Continuous shake:", !continuousShake);
-          }}
-        >
-          {continuousShake ? 'Stop Shake' : 'Start Shake'}
-        </button>
-        
-        <button
-          className="px-2 py-1 bg-green-500 text-white rounded text-xs"
-          onClick={() => {
-            setContinuousBounce(!continuousBounce);
-            console.log("[NotificationBell] 🔄 Continuous bounce:", !continuousBounce);
-          }}
-        >
-          {continuousBounce ? 'Stop Bounce' : 'Start Bounce'}
-        </button>
-      </div> */}
+     
 
       {/* Notification dropdown with backdrop blur effect */}
       {open && (

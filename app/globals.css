@@ -172,5 +172,8 @@ body {
 }
 
 .animate-premium-pulse {
-  animation: premium-pulse 1s ease-in-out infinite;
+  animation: premium-pulse 1ms ease-in-out infinite;
+}
+.slow-bounce {
+  animation: bounce 2s infinite; /* 2s instead of 1s */
 }

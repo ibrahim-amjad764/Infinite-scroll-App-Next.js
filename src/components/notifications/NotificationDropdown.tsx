@@ -161,14 +161,11 @@
   </div>
 </div> */}
 
-
 // "use client";
-//  I want to make  dropdown is closed on only X button when i clicked on  anywhere that closed the notification drop down easily closed or make responsive page
 import { NotificationItem } from "./NotificationItem";
 import { useNotificationStore, Notification as StoreNotification } from "../../store/notificationStore";
 import api from "../../lib/api";
 import { useEffect, useState } from "react";
-import { errorMonitor } from "events";
 
 interface NotificationAPI {
   id: string;
@@ -237,7 +234,6 @@ export function NotificationDropdown({ onClose }: Props) {
   return (
  <div className="absolute right-0 mt-4 w-[380px] backdrop-blur-xl bg-white/80 dark:bg-zinc-900/80 border border-white/20 dark:border-zinc-700 rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.25)] overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-300">
 
-
   <div className="px-5 py-4 flex items-center justify-between border-b border-gray-200 dark:border-zinc-700">
     <div>
       <h2 className="text-base font-semibold text-gray-900 dark:text-white">
@@ -248,8 +244,7 @@ export function NotificationDropdown({ onClose }: Props) {
 
     <button
       onClick={onClose}
-      className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-200 dark:hover:bg-zinc-700 tracking-wide hover:brightness-125 transition-all duration-200 ease-in-out hover:scale-105 active:scale-95 disabled:opacity-60"
-    >
+      className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-200 dark:hover:bg-zinc-700 tracking-wide hover:brightness-125 transition-all duration-200 ease-in-out hover:scale-105 active:scale-95 disabled:opacity-60">
       ✕
     </button>
   </div>
@@ -269,7 +264,6 @@ export function NotificationDropdown({ onClose }: Props) {
 
   <div className="max-h-[420px] overflow-y-auto">
 
-
     {notifications.length === 0 && (
       <div className="flex flex-col items-center justify-center py-12 text-gray-400">
         <div className="text-4xl mb-2">🔕</div>
@@ -278,20 +272,17 @@ export function NotificationDropdown({ onClose }: Props) {
       </div>
     )}
 
-
     {notifications.map((n, index) => (
       <div
         key={n.id}
         className={`relative group px-5 py-4 flex gap-3 items-start transition-all duration-200 border-b last:border-none border-gray-100 dark:border-zinc-800
         hover:bg-linear-to-r hover:from-gray-50 hover:to-transparent dark:hover:from-zinc-800
         ${!n.read ? "bg-blue-50/40 dark:bg-blue-900/10" : ""}
-        `}
-      >
+        `}>
 
         {!n.read && (
           <span className="absolute left-2 top-6 w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
         )}
-
 
         <div className="w-10 h-10 rounded-full bg-linear-to-r bg-cyan-800 flex items-center justify-center text-white font-semibold text-sm shadow-md">
           {n.sender?.firstName?.[0] || "U"}
@@ -333,8 +324,7 @@ export function NotificationDropdown({ onClose }: Props) {
   <div className="p-3 border-t border-gray-200 dark:border-zinc-700 bg-white/60 dark:bg-zinc-900/60 backdrop-blur">
     <button
       className="w-full text-sm font-medium text-blue-600 hover:text-blue-900 tracking-wide hover:brightness-125 transition-all duration-200 ease-in-out hover:scale-105 active:scale-95 disabled:opacity-60"
-      onClick={() => console.log("[Notifications] View all")}
-    >
+      onClick={() => console.log("[Notifications] View all")}>
       View all notifications →
     </button>
   </div>

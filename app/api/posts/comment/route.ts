@@ -186,4 +186,3 @@ export async function POST(req: NextRequest) {
     return Response.json({ error: "Failed to add comment" }, { status: 500 });
   }
 }
-

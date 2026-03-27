@@ -49,6 +49,7 @@
 // }));
 // });
 
+
 // src/lib/mappers.ts
 import { User as UserEntity } from "../entities/user";
 import { Post as PostEntity } from "../entities/post";
@@ -89,17 +90,12 @@ export const mapPostForComponents = (post: PostEntity) => ({
   },
 });
  
-const followers = (dbUser.followers || []).map((u) => ({
-  id: u.id,
-  firstName: u.firstName,
-  avatarUrl: u.avatarUrl,
-}));
- 
-const following = (dbUser.following || []).map((u) => ({
-  id: u.id,
-  firstName: u.firstName,
-  avatarUrl: u.avatarUrl,
-}));
+interface DBUser {
+  followers?: { id: string; firstName: string; avatarUrl?: string }[];
+  following?: { id: string; firstName: string; avatarUrl?: string }[];
+}
 
-
-
+const dbUser: DBUser = {
+  followers: [],
+  following: [],
+};

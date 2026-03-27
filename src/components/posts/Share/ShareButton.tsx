@@ -1,11 +1,11 @@
 "use client";
 
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../../../../components/ui/dialog";
+import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { Button } from "../../../../components/ui/button";
 import { Share2 } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../../../../components/ui/dialog";
 import { toast } from "sonner";
-import { motion, AnimatePresence } from "framer-motion";
 
 export function ShareButton() {
   const [isOpen, setIsOpen] = useState(false);

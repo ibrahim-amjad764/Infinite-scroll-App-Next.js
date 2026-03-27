@@ -57,6 +57,8 @@
 //     </div>
 //   );
 // }
+
+
 import CommentSection from './comments/CommentSection';
 import { LikeButton } from './likes/LikeButton';
 import { useEffect, useState } from 'react';
@@ -142,15 +144,13 @@ export default function Post({ postId, currentUser }: PostProps) {
               key={i}
               src={m.url}
               alt={`Post image ${i + 1}`}
-              className="rounded-md object-cover w-48 h-48"
-            />
+              className="rounded-md object-cover w-48 h-48" />
           ) : (
             <video
               key={i}
               src={m.url}
               controls
-              className="rounded-md object-cover w-64 h-64"
-            />
+              className="rounded-md object-cover w-64 h-64" />
           )
         )}
       </div>
@@ -161,15 +161,12 @@ export default function Post({ postId, currentUser }: PostProps) {
           postId={post.id}
           userId={currentUser.id}
           initialIsLiked={post.isLikedByUser}
-          initialLikesCount={post.likesCount}
-        />
-
+          initialLikesCount={post.likesCount}/>
         {/* Show delete only for post owner */}
         {post.userId === currentUser.id && (
           <Button
             variant="destructive"
-            onClick={handleDelete}
-          >
+            onClick={handleDelete}>
             Delete Post
           </Button>
         )}
@@ -178,8 +175,7 @@ export default function Post({ postId, currentUser }: PostProps) {
       {/* Comments */}
       <CommentSection
         postId={post.id}
-        userId={currentUser.id}
-      />
+        userId={currentUser.id}/>
     </div>
   );
 }

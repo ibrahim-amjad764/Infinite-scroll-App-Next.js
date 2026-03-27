@@ -258,34 +258,34 @@
 
 "use client";
 
-import { useState, useEffect, KeyboardEvent } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { Heart, MessageCircle, Share2, Moon } from "lucide-react";
 import { Card, CardContent, CardFooter, CardHeader } from "../../components/ui/card";
+import { useState, useEffect, KeyboardEvent } from "react";
+import { Heart, MessageCircle, Share2, Moon } from "lucide-react";
+import { getFirebaseToken, authFetch } from "../../src/services/auth.service";
 import { Avatar, AvatarFallback } from "../../components/ui/avatar";
-import { Button } from "../../components/ui/button";
+import { NotificationBell } from "../../src/components/notifications/NotificationBell";
+import { CreatePostModal } from "../../src/components/posts/CreatePostModal";
 import { SidebarProvider } from "../../components/ui/sidebar";
 import { SkeletonLoader } from "../../components/ui/SkeletonLoader";
-import { renderUser } from "../../src/types/renderUser";
-import { Loader2 } from "lucide-react";
-import { CreatePostModal } from "../../src/components/posts/CreatePostModal";
-import { toast } from "sonner";
-import { auth } from "../../src/lib/firebase";
-import { getFirebaseToken, authFetch } from "../../src/services/auth.service";
-import { LikeButton } from "../../src/components/posts/likes/LikeButton";
-import { ShareButton } from "../../src/components/posts/Share/ShareButton";
 import { FollowButton } from "../../src/components/membership/profile-page/FollowButton";
-import { NotificationBell } from "../../src/components/notifications/NotificationBell";
+import { ShareButton } from "../../src/components/posts/Share/ShareButton";
 import { searchUsers } from "../../src/services/user.service";
 import { useDebounce } from "../../src/lib/useDebounce";
+import { renderUser } from "../../src/types/renderUser";
+import { LikeButton } from "../../src/components/posts/likes/LikeButton";
+import { useQuery } from "@tanstack/react-query";
+import { Loader2 } from "lucide-react";
+import { Button } from "../../components/ui/button";
+import { toast } from "sonner";
+import { auth } from "../../src/lib/firebase";
+import SearchSuggestions from "../../src/components/notifications/SearchSuggestions";
+import ProfileDropdown from "../../components/ui/dropdown-profile";
+import InfiniteScroll from "react-infinite-scroll-component";
+import CommentSection from "../../src/components/posts/comments/CommentSection";
+import ThemeDropdown from "../../components/ui/dropdown-theme";
+import SearchBar from "../../src/components/notifications/SearchBar"
 import Image from "next/image";
 import Link from "next/link"; // Import Link here
-import InfiniteScroll from "react-infinite-scroll-component";
-import ThemeDropdown from "../../components/ui/dropdown-theme";
-import ProfileDropdown from "../../components/ui/dropdown-profile";
-import CommentSection from "../../src/components/posts/comments/CommentSection";
-import SearchBar from "../../src/components/notifications/SearchBar"
-import SearchSuggestions from "../../src/components/notifications/SearchSuggestions";
 
 // FeedPost displaying content and comments
 const FeedPost = ({
@@ -315,7 +315,6 @@ const FeedPost = ({
     return fullName;
   };
 
-
   return (
     <Card key={post.id} className="shadow-md mb-6 overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800 transition-all duration-300 hover:shadow-xl hover:scale-[1.001]">
       <CardHeader className="flex items-start justify-between gap-3 p-4">
@@ -326,8 +325,7 @@ const FeedPost = ({
             <Link
               href={`/profile/${post.user.id}`}
               className="cursor-pointer"
-              onClick={() => console.log(`[Profile Click] Avatar clicked for userId: ${post.user.id}`)}
-            >
+              onClick={() => console.log(`[Profile Click] Avatar clicked for userId: ${post.user.id}`)}>
               <Avatar>
                 {/* <AvatarFallback>{post.user.email[0]?.toUpperCase()}</AvatarFallback> */}
                 <AvatarFallback> {post.user.email ? post.user.email[0].toUpperCase() : "?"}</AvatarFallback>
@@ -338,8 +336,7 @@ const FeedPost = ({
               <Link
                 href={`/profile/${post.user.id}`}
                 className="text-sm font-semibold cursor-pointer hover:underline transition-transform duration-200 ease-in-out transform origin-top active:scale-95"
-                onClick={() => console.log(`[Profile Click] Username clicked for userId: ${post.user.id}`)}
-              >
+                onClick={() => console.log(`[Profile Click] Username clicked for userId: ${post.user.id}`)} >
                 {renderUser(post.user)}
               </Link>
               <p className="text-xs text-muted-foreground">
@@ -368,7 +365,7 @@ const FeedPost = ({
             loading="eager" />
           {post.images.length > 1 && (
             <div className="absolute inset-0 flex items-center justify-between px-2">
-              <Button size="default" variant="secondary" onClick={() => prevImage(post.id)} disabled={activeIndex === 0}> 
+              <Button size="default" variant="secondary" onClick={() => prevImage(post.id)} disabled={activeIndex === 0}>
                 ‹
               </Button>
               <Button
@@ -388,8 +385,8 @@ const FeedPost = ({
           postId={post.id}
           initialIsLiked={isLiked} // true/false if the current user liked it
           initialLikesCount={post.likesCount || 0}  // pass the likesCount to the button
-          userId={userId} // User ID to identify the current user
-        />
+          userId={userId} /> 
+
         <Button variant="ghost" size="sm" onClick={handleCommentButtonClick} className="flex items-center text-gray-800 hover:text-blue-500  dark:text-white dark:hover:text-blue-500 transition-all duration-200 ease-in-out hover:scale-105 active:scale-95">
           <MessageCircle className="h-4 w-4 mr-1 " /> Comment
         </Button>
@@ -457,8 +454,6 @@ export default function FeedPage() {
   const [query, setQuery] = useState("")
   const [users, setUsers] = useState<any[]>([]);
   const [searchLoading, setSearchLoading] = useState(false);
-
-  //  Debounce (important for performance)
   const debouncedQuery = useDebounce(query, 400);
   const { data, isLoading, isError } = useQuery<FetchPostsResponse>({
     queryKey: ["posts", page],
@@ -468,10 +463,9 @@ export default function FeedPage() {
   });
 
   const handleSearch = async () => {
+    const results = await searchUsers(query);
     console.log(" Manual search:", query);
     setSearchLoading(true);
-    const results = await searchUsers(query);
-
     setUsers(results);
     setSearchLoading(false);
   };
@@ -512,7 +506,6 @@ export default function FeedPage() {
       return () => clearTimeout(timer);
     }
   }, [isLoading, isError]);
-
 
   const nextImage = (postId: string, length: number) =>
     setActiveIndices((prev) => ({ ...prev, [postId]: Math.min((prev[postId] ?? 0) + 1, length - 1) }));
@@ -612,8 +605,7 @@ export default function FeedPage() {
           <Loader2 className="h-8 w-8 animate-spin" />
         </div>
       }
-      endMessage={<p className="flex justify-center py-4">No more posts to show</p>}
-    >
+      endMessage={<p className="flex justify-center py-4">No more posts to show</p>} >
       {posts.map((post, index) => {
         const activeIndex = activeIndices[post.id] ?? 0;
 
@@ -649,8 +641,7 @@ export default function FeedPage() {
                 value={query}
                 onChange={setQuery}
                 onSearch={handleSearch}
-                placeholder="Search users..."
-              />
+                placeholder="Search users..." />
 
               {(query || searchLoading) && (
                 <SearchSuggestions users={users} loading={searchLoading} query={query} />
@@ -674,5 +665,3 @@ export default function FeedPage() {
     </SidebarProvider>
   );
 }
-
-

@@ -129,7 +129,6 @@ export async function PUT(req: Request) {
     }
 
     const repo = AppDataSource!.getRepository(User);
-
     const body = await req.json();
     const target = await getAuthUser(repo);
 
@@ -178,7 +177,3 @@ export async function PUT(req: Request) {
     return Response.json({ error: "Update failed" }, { status: 500 });
   }
 }
-
-// NOTE: Token refresh must happen on CLIENT-SIDE using Firebase SDK:
-// await firebase.auth().currentUser?.getIdToken(true)
-// Then update the 'auth-token' cookie and retry the request

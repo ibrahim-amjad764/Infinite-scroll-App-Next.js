@@ -1,12 +1,12 @@
 "use client";
 
-import Link from "next/link";
-import { Button } from "../../../../components/ui/button";
-import { Card, CardContent } from "../../../../components/ui/card";
-import { Badge } from "../../../../components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "../../../../components/ui/avatar";
 import { Calendar, Mail, MapPin } from "lucide-react";
+import { Card, CardContent } from "../../../../components/ui/card";
+import { Button } from "../../../../components/ui/button";
+import { Badge } from "../../../../components/ui/badge";
 import LogoutButton from "../logout-page-03/logout-form";
+import Link from "next/link";
 
 /** Props: user from API, onEdit callback for Edit Profile button */
 interface ProfileHeaderProps {
@@ -136,8 +136,7 @@ export default function ProfileHeader({
             <Button
               variant="default"
               onClick={onEdit}
-              className="w-full md:w-auto transition-transform duration-200 ease-in-out hover:scale-105 active:scale-95"
-            >
+              className="w-full md:w-auto transition-transform duration-200 ease-in-out hover:scale-105 active:scale-95" >
               Edit Profile
             </Button>
           )}
@@ -146,4 +145,3 @@ export default function ProfileHeader({
     </Card>
   );
 }
-

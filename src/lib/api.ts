@@ -106,7 +106,6 @@
 
 import axios, { AxiosInstance, AxiosError } from "axios";
 
-// Base URL for Next.js internal API routes
 const BASE_URL = "/api";
 console.log("[API] Base URL:", BASE_URL);
 

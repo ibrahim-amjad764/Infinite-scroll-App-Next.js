@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect ,useState, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle  } from "../../../components/ui/dialog";
-import { Button } from "../../../components/ui/button";
-import { Textarea } from "../../../components/ui/textarea";
-import Image from "next/image";
-import { toast } from "sonner";
+import { useEffect ,useState, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { Textarea } from "../../../components/ui/textarea";
+import { Button } from "../../../components/ui/button";
+import { toast } from "sonner";
+import Image from "next/image";
 import axios from "axios";
 
 interface Props {
@@ -32,7 +32,6 @@ export function CreatePostModal({ open, onClose, onSuccess }: Props) {
   const sanitizedImages = images.filter((img): img is string => Boolean(img));
 
   // Upload image with progress
-
   const uploadImageToCloudinaryWithProgress = async (
     file: File,
     onProgress: (percent: number) => void
@@ -56,7 +55,6 @@ export function CreatePostModal({ open, onClose, onSuccess }: Props) {
   };
 
   // Handle selected files
-
   const handleFiles = async (files: FileList | null) => {
     if (!files) return;
 
@@ -146,7 +144,6 @@ export function CreatePostModal({ open, onClose, onSuccess }: Props) {
   }
 
   setLoading(true);
-
   try {
     const res = await fetch("/api/posts", {
       method: "POST",
@@ -173,7 +170,6 @@ export function CreatePostModal({ open, onClose, onSuccess }: Props) {
 
     toast.success("Post created successfully!");
     queryClient.invalidateQueries({ queryKey: ["posts"] });
-
     setContent("");
     setImages([]);
     setActiveIndex(0);
@@ -200,7 +196,6 @@ export function CreatePostModal({ open, onClose, onSuccess }: Props) {
   return (
   <Dialog isOpen={open} onClose={onClose}> 
     <DialogContent className="max-w-lg bg-gray-300 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 shadow-xl rounded-xl">
-      
       <DialogHeader>
   <DialogTitle>
     <h2 className="text-l text-center italic font-semibold text-zinc-900 dark:text-zinc-100">
@@ -208,7 +203,6 @@ export function CreatePostModal({ open, onClose, onSuccess }: Props) {
     </h2>
   </DialogTitle>
 </DialogHeader>
-
 
       <Textarea
         placeholder="What's on your mind?"

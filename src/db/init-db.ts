@@ -38,7 +38,7 @@ export async function initDB() {
       await AppDataSource!.initialize();
       console.log("[init-db] Database connected successfully");
 
-      // ⚡ Synchronize notifications table (already handled by synchronize:true)
+      //  Synchronize notifications table (already handled by synchronize:true)
       const notificationRepo = AppDataSource!.getRepository(Notification);
       console.log("[init-db] Notifications table is ready");
 

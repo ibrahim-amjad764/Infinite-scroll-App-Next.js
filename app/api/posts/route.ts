@@ -42,7 +42,6 @@ async function getAuthUser(): Promise<User | null> {
 }
 
 // --- GET: fetch posts with likes & comments info ---
-
 export async function GET(req: Request) {
   const startTime = Date.now();
   console.log("[GET /api/posts] Start request");
@@ -214,13 +213,12 @@ export async function POST(req: Request) {
     if (images && !Array.isArray(images)) {
       return NextResponse.json({ error: "Images must be an array" }, { status: 400 });
     }
-    
 
     const postRepo = AppDataSource.getRepository(Post);
-// const post = await postRepo.findOne({
-//   where: { id: postId },
-//   relation: ["user"], 
-// });
+    // const post = await postRepo.findOne({
+    //   where: { id: postId },
+    //   relation: ["user"], 
+    // });
 
     const newPost: Partial<Post> = {
       content: content.trim(),

@@ -21,7 +21,7 @@ interface NotificationPayload {
 }
 
 // ==========================
-// ✅ DATABASE INITIALIZATION (from file 2 - SAFE ADD)
+//  DATABASE INITIALIZATION (from file 2 - SAFE ADD)
 // ==========================
 console.log('[WebSocket] Starting WebSocket server...');
 
@@ -45,12 +45,12 @@ try {
 }
 
 // ==========================
-// ✅ MULTI-DEVICE SUPPORT (already in file 1)
+//  MULTI-DEVICE SUPPORT (already in file 1)
 // ==========================
 const connectedUsers: Record<string, WebSocket[]> = {};
 
 // ==========================
-// ✅ SERVER CONFIG (enhanced)
+//  SERVER CONFIG (enhanced)
 // ==========================
 export const wss = new WebSocketServer({
   port: 3001,
@@ -60,7 +60,7 @@ export const wss = new WebSocketServer({
 console.log('[WebSocket] Server started on ws://localhost:3001');
 
 // ==========================
-// ✅ BROADCAST FUNCTION (from file 2 - reusable + scalable)
+//  BROADCAST FUNCTION (from file 2 - reusable + scalable)
 // ==========================
 const broadcast = (message: any) => {
   const payload = JSON.stringify(message);
@@ -81,7 +81,7 @@ const broadcast = (message: any) => {
 };
 
 // ==========================
-// ✅ SAVE COMMENT FUNCTION (clean architecture)
+//  SAVE COMMENT FUNCTION (clean architecture)
 // ==========================
 const saveComment = async (postId: string, content: string, userId: string) => {
   try {
@@ -125,7 +125,7 @@ const saveComment = async (postId: string, content: string, userId: string) => {
 };
 
 // ==========================
-// ✅ CONNECTION HANDLER
+//  CONNECTION HANDLER
 // ==========================
 wss.on('connection', (ws: WebSocket, req: any) => {
 
@@ -143,7 +143,7 @@ wss.on('connection', (ws: WebSocket, req: any) => {
 
   console.log(`[WebSocket] User ${userId} connected`);
 
-  // ✅ SEND WELCOME MESSAGE (from file 2)
+  //  SEND WELCOME MESSAGE (from file 2)
   ws.send(JSON.stringify({
     type: 'connection',
     status: 'connected',
@@ -162,7 +162,7 @@ wss.on('connection', (ws: WebSocket, req: any) => {
   });
 
   // ==========================
-  // ✅ MESSAGE HANDLER (MERGED LOGIC)
+  //  MESSAGE HANDLER (MERGED LOGIC)
   // ==========================
   ws.on('message', async (message: string) => {
     console.log(`[WebSocket] Received from ${userId}:`, message);
@@ -171,7 +171,7 @@ wss.on('connection', (ws: WebSocket, req: any) => {
       const parsed = JSON.parse(message);
       const { postId, content, type } = parsed;
 
-      // ✅ SUPPORT BOTH FORMATS (IMPORTANT FIX)
+      //  SUPPORT BOTH FORMATS (IMPORTANT FIX)
       const finalType = type || 'comment';
 
       if (finalType === 'comment' && postId && content) {
@@ -195,7 +195,7 @@ wss.on('connection', (ws: WebSocket, req: any) => {
         }));
 
         // ==========================
-        // ✅ NOTIFICATIONS (from file 1)
+        //  NOTIFICATIONS (from file 1)
         // ==========================
         const postRepo = db.getRepository(Post);
         const post = await postRepo.findOne({ where: { id: postId }, relations: ['user'] });
@@ -235,7 +235,7 @@ wss.on('connection', (ws: WebSocket, req: any) => {
 });
 
 // ==========================
-// ✅ NOTIFICATION FUNCTION (UNCHANGED)
+//  NOTIFICATION FUNCTION (UNCHANGED)
 // ==========================
 export function pushNotificationToUser(userId: string, notification: NotificationPayload) {
   const sockets = connectedUsers[userId] || [];
@@ -250,7 +250,7 @@ export function pushNotificationToUser(userId: string, notification: Notificatio
 }
 
 // ==========================
-// ✅ GRACEFUL SHUTDOWN (from file 2)
+//  GRACEFUL SHUTDOWN (from file 2)
 // ==========================
 process.on('SIGINT', () => {
   console.log('[WebSocket] Shutting down...');

@@ -1,16 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
 import { EyeIcon, EyeOffIcon, MailIcon, LockIcon } from "lucide-react";
-import { Button } from "../../../../components/ui/button";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { jwtDecode } from "jwt-decode";
 import { Checkbox } from "../../../../components/ui/checkbox";
+import { Button } from "../../../../components/ui/button";
+import { motion } from "framer-motion";
 import { Label } from "../../../../components/ui/label";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
-import { getAuth, onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
 import { app } from "@/lib/firebase";
-import { jwtDecode } from "jwt-decode";
-import { motion } from "framer-motion";
 
 const LoginForm = () => {
   const [email, setEmail] = useState("");
@@ -111,8 +111,7 @@ const LoginForm = () => {
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="relative z-10"
-      >
+        className="relative z-10" >
         <div className="bg-white/5 backdrop-blur-lg rounded-3xl p-15 max-w-md w-full border border-gray-500/50 shadow-lg">
           <div className="flex justify-center mb-8">
             <div className="w-22 h-22 bg-white/20 rounded-full flex items-center justify-center">
@@ -120,8 +119,7 @@ const LoginForm = () => {
                 className="w-15 h-15 text-white/50"
                 fill="currentColor"
                 viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
+                aria-hidden="true" >
                 <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
               </svg>
             </div>
@@ -143,8 +141,7 @@ const LoginForm = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full bg-transparent border-b border-white/50 placeholder-white/70 pl-10 py-2 text-white focus:outline-none focus:border-white transition"
-              />
+                className="w-full bg-transparent border-b border-white/50 placeholder-white/70 pl-10 py-2 text-white focus:outline-none focus:border-white transition" />
               <MailIcon className="absolute left-0 top-1/2 -translate-y-1/2 text-white/70 ml-1.5" size={20} />
             </div>
 
@@ -158,15 +155,13 @@ const LoginForm = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full bg-transparent border-b border-white/50 placeholder-white/70 pl-10 pr-10 py-2 text-white focus:outline-none focus:border-white transition"
-              />
+                className="w-full bg-transparent border-b border-white/50 placeholder-white/70 pl-10 pr-10 py-2 text-white focus:outline-none focus:border-white transition" />
               <LockIcon className="absolute left-0 top-1/2 -translate-y-1/2 text-white/70 ml-1.5" size={20} />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-0 top-1/2 -translate-y-1/2 mr-2 text-white/70 hover:text-white transition"
-                aria-label={showPassword ? "Hide password" : "Show password"}
-              >
+                aria-label={showPassword ? "Hide password" : "Show password"} >
                 {showPassword ? <EyeOffIcon size={20} /> : <EyeIcon size={20} />}
               </button>
             </div>
@@ -185,8 +180,7 @@ const LoginForm = () => {
             {/* Submit button */}
             <Button
               type="submit" disabled={loading}
-              className="w-full bg-linear-to-r from-gray-600 to-gray-800 rounded-full py-3  text-white font-semibold tracking-wide hover:brightness-125 transition-all duration-200 ease-in-out hover:scale-105 active:scale-95 disabled:opacity-60"
-            >
+              className="w-full bg-linear-to-r from-gray-600 to-gray-800 rounded-full py-3  text-white font-semibold tracking-wide hover:brightness-125 transition-all duration-200 ease-in-out hover:scale-105 active:scale-95 disabled:opacity-60" >
               {loading ? "Logging in..." : "LOGIN"}
             </Button>
 

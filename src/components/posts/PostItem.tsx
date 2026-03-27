@@ -1,8 +1,8 @@
 //src/components/posts/PostItem.tsx
 "use client";
 
-import React from "react";
 import { Card } from "../../../components/ui/card";
+import React from "react";
 import UserProfileSummary from "../membership/profile-page/UserProfileSummary";
 
 interface Comment {
@@ -41,8 +41,7 @@ export default function PostItem({ post }: PostItemProps) {
         <img
           src={post.images[0]}
           alt="Post image"
-          className="w-full max-h-72 object-cover rounded-md mt-3"
-        />
+          className="w-full max-h-72 object-cover rounded-md mt-3" />
       ) : null}
 
       <div className="w-full flex justify-end mt-1">

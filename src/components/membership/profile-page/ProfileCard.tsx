@@ -106,6 +106,7 @@
 // }
 // export default ProfileCard;
 
+
 "use client";
 
 import InfiniteScroll from "react-infinite-scroll-component";
@@ -189,14 +190,12 @@ const ProfileCard = ({ posts = [], hasMore, loadMore }: ProfileCardProps) => {
               <p className="text-center text-gray-600 text-sm mt-4 italic">
                 No more posts exist for this user.
               </p>
-            }
-          >
+            }  >
             <div className="space-y-4">
               {posts.map((post) => (
                 <Card
                   key={post.id}
-                  className="p-4 bg-white border border-gray-200 shadow-sm w-full overflow-hidden dark:bg-zinc-800"
-                >
+                  className="p-4 bg-white border border-gray-200 shadow-sm w-full overflow-hidden dark:bg-zinc-800" >
                   {/* Post content */}
                   <p className="text-sm sm:text-base text-gray-700 warp-break-words dark:text-gray-400">
                     {post.content}
@@ -208,8 +207,7 @@ const ProfileCard = ({ posts = [], hasMore, loadMore }: ProfileCardProps) => {
                       <img
                         src={post.images[0]}
                         alt="Post image"
-                        className="w-full max-h-72 object-cover rounded-md"
-                      />
+                        className="w-full max-h-72 object-cover rounded-md"/>
                     </div>
                   ) : null}
 
@@ -259,5 +257,4 @@ const ProfileCard = ({ posts = [], hasMore, loadMore }: ProfileCardProps) => {
     </div>
   );
 };
-
 export default ProfileCard;

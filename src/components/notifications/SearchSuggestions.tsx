@@ -4,7 +4,6 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-// ✅ Extended type
 interface UserType {
   id: string | number;
   username: string;
@@ -19,7 +18,6 @@ interface SearchSuggestionsProps {
   query: string;
 }
 
-//  Highlight search match
 const highlightText = (text: string, query: string) => {
   if (!query) return text;
 
@@ -78,7 +76,6 @@ const SearchSuggestions = ({ users, loading, query }: SearchSuggestionsProps) =>
   window.addEventListener("keydown", handleKeyDown);
   return () => window.removeEventListener("keydown", handleKeyDown);
 
-//
 // Use JSON.stringify(users/recent) to track content changes
 }, [activeIndex, query, JSON.stringify(users), JSON.stringify(recent)]);
 
@@ -128,8 +125,7 @@ const SearchSuggestions = ({ users, loading, query }: SearchSuggestionsProps) =>
             onClick={() => saveRecent(user)}
             className={`flex items-center gap-3 px-4 py-3 transition-all duration-200 ${
               isActive ? "bg-blue-100" : "hover:bg-gray-100"
-            }`}
-          >
+            }`}>
             {/* Avatar */}
             <div className="w-10 h-10 rounded-full bg-linear-to-br from-blue-500 to-indigo-500 flex items-center justify-center text-white font-bold text-sm">
               {user.username?.[0]?.toUpperCase() || "U"}

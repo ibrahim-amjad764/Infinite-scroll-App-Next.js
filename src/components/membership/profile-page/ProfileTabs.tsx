@@ -165,15 +165,13 @@ export default function ProfileTabs({
               ? "text-blue-600 font-semibold"
               : "text-gray-500 hover:text-gray-700"
               }`}
-            onClick={() => setActive(tab.key)}
-          >
+            onClick={() => setActive(tab.key)} >
             {tab.label}
             {active === tab.key && (
               <motion.div
                 layoutId="underline"
                 className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 rounded"
-                transition={{ type: "spring", stiffness: 500, damping: 30 }}
-              />
+                transition={{ type: "spring", stiffness: 500, damping: 30 }}  />
             )}
           </motion.button>
         ))}
@@ -189,8 +187,7 @@ export default function ProfileTabs({
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.3 }}
-              className="space-y-4"
-            >
+              className="space-y-4"  >
               {posts.length > 0 ? (
                 posts.map((p) => {
                   console.log("Rendering post:", p.id, "Likes:", p.likesCount);
@@ -216,8 +213,7 @@ export default function ProfileTabs({
                           postId={p.id}
                           userId={p.user.id} // ⚠️ temporary (see note below)
                           initialIsLiked={false} // later dynamic karenge
-                          initialLikesCount={p.likesCount}
-                        />
+                          initialLikesCount={p.likesCount} />
                       </div>
                       
                       {/* <Button
@@ -227,14 +223,11 @@ export default function ProfileTabs({
                             className={`${isLiked
                                 ? "text-red-500"
                                 : "text-gray-800 hover:text-red-500"
-                              } dark:text-white dark:hover:text-red-500 flex items-center transition-colors duration-200 ease-in-out hover:scale-105 active:scale-95`}
-                          >
+                              } dark:text-white dark:hover:text-red-500 flex items-center transition-colors duration-200 ease-in-out hover:scale-105 active:scale-95`} >
                             <Heart
-                              className={`h-4 w-4 mr-1 ${isLiked ? "fill-current" : ""}`}
-                            />
+                              className={`h-4 w-4 mr-1 ${isLiked ? "fill-current" : ""}`}  />
                             {likesCount} {likesCount === 1 ? "Like" : "Likes"}
                           </Button> */}
-
                     </div>
                   );
                 })
@@ -250,14 +243,12 @@ export default function ProfileTabs({
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -50 }}
               transition={{ duration: 0.3 }}
-              className="space-y-2"
-            >
+              className="space-y-2"  >
               {comments.length > 0 ? (
                 comments.map((c) => (
                   <div
                     key={c.id}
-                    className="p-3 border-b rounded-lg hover:bg-gray-50 transition-colors"
-                  >
+                    className="p-3 border-b rounded-lg hover:bg-gray-50 transition-colors"  >
                     <strong>{c.user.firstName}:</strong> {c.content}
                   </div>
                 ))
@@ -274,14 +265,12 @@ export default function ProfileTabs({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
-              className="space-y-2"
-            >
+              className="space-y-2"  >
               {likes.length > 0 ? (
                 likes.map((l) => (
                   <div
                     key={l.id}
-                    className="p-3 border-b rounded-lg hover:bg-gray-50 transition-colors"
-                  >
+                    className="p-3 border-b rounded-lg hover:bg-gray-50 transition-colors"  >
                     Liked Post: {l.postId || "Unknown"}
                   </div>
                 ))
@@ -301,8 +290,7 @@ export default function ProfileTabs({
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.3 }}
-              className="max-h-[400px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300"
-            >
+              className="max-h-[400px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300"  >
               {followers.length > 0 ? (
                 <div className="flex flex-col divide-y">
                   {followers.map((f) => {
@@ -316,8 +304,7 @@ export default function ProfileTabs({
                               <img
                                 src={f.avatarUrl}
                                 alt={f.firstName}
-                                className="w-full h-full object-cover"
-                              />
+                                className="w-full h-full object-cover"   />
                             ) : (
                               <span className="flex items-center justify-center w-full h-full bg-blue-500 text-white font-bold">
                                 {f.firstName?.[0]?.toUpperCase() || "U"}
@@ -349,8 +336,7 @@ export default function ProfileTabs({
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.3 }}
-              className="max-h-[400px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300"
-            >
+              className="max-h-[400px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300"  >
               {following.length > 0 ? (
                 <div className="flex flex-col divide-y">
                   {following.map((f) => {
@@ -364,8 +350,7 @@ export default function ProfileTabs({
                               <img
                                 src={f.avatarUrl}
                                 alt={f.firstName}
-                                className="w-full h-full object-cover"
-                              />
+                                className="w-full h-full object-cover"  />
                             ) : (
                               <span className="flex items-center justify-center w-full h-full bg-blue-500 text-white font-bold">
                                 {f.firstName?.[0]?.toUpperCase() || "U"}

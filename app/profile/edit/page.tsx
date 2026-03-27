@@ -1,28 +1,28 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-import { toast } from "sonner";
 import { fetchUserProfile, updateUserProfile } from "../../api/profile-user/user";
-import ProfileContent from "../../../src/components/membership/profile-page/ProfileContent";
-import Loader from "../../../components/ui/Loader";
-import { Button } from "../../../components/ui/button";
-import { SidebarProvider } from "../../../components/ui/sidebar";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useEffect } from "react";
 import { NotificationBell } from "../../../src/components/notifications/NotificationBell";
-import ThemeDropdown from "../../../components/ui/dropdown-theme";
-import ProfileDropdown from "../../../components/ui/dropdown-profile";
 import { CreatePostModal } from "../../../src/components/posts/CreatePostModal";
-import Image from "next/image";
-import { Avatar } from "../../../components/ui/avatar";
+import { SidebarProvider } from "../../../components/ui/sidebar";
 import { AvatarFallback } from "@radix-ui/react-avatar";
-import { Moon } from "lucide-react";
-import SearchBar from "../../../src/components/notifications/SearchBar";
-import SearchSuggestions from "../../../src/components/notifications/SearchSuggestions";
 import { searchUsers } from "../../../src/services/user.service";
 import { useDebounce } from "../../../src/lib/useDebounce";
-import { useQuery } from "@tanstack/react-query";
 import { authFetch } from "../../../src/services/auth.service";
+import { useQuery } from "@tanstack/react-query";
+import { Button } from "../../../components/ui/button";
+import { Avatar } from "../../../components/ui/avatar";
+import { toast } from "sonner";
+import { Moon } from "lucide-react";
+import SearchSuggestions from "../../../src/components/notifications/SearchSuggestions";
+import ProfileDropdown from "../../../components/ui/dropdown-profile";
+import ProfileContent from "../../../src/components/membership/profile-page/ProfileContent";
+import ThemeDropdown from "../../../components/ui/dropdown-theme";
+import SearchBar from "../../../src/components/notifications/SearchBar";
+import Link from "next/link";
+import Loader from "../../../components/ui/Loader";
+import Image from "next/image";
 
 interface User {
   id: string;
@@ -53,8 +53,6 @@ const EditProfilePage = () => {
   const [users, setUsers] = useState<any[]>([]);
   const [searchLoading, setSearchLoading] = useState(false);
   const [page, setPage] = useState(1);
-
-    //  Debounce (important for performance)
   const debouncedQuery = useDebounce(query, 400);
   const { data, isLoading, isError } = useQuery<FetchPostsResponse>({
     queryKey: ["posts", page],
@@ -70,12 +68,12 @@ const EditProfilePage = () => {
       if (!res.ok) {
         throw new Error(`Failed to fetch posts: ${res.status} ${res.statusText}`);
       }
-  
+
       const contentType = res.headers.get("content-type");
       if (!contentType || !contentType.includes("application/json")) {
         throw new Error("Expected JSON response but received HTML");
       }
-  
+
       const data = await res.json();
       if (Array.isArray(data)) return { posts: data, hasMore: true };
       return { posts: data.posts || [], hasMore: data.hasMore || false };
@@ -89,7 +87,7 @@ const EditProfilePage = () => {
     document.title = "Edit Profile | My Next JS App";
   }, []);
 
-    useEffect(() => {
+  useEffect(() => {
     const fetchUsers = async () => {
       if (!debouncedQuery) {
         console.log(" Clearing search results");
@@ -136,11 +134,10 @@ const EditProfilePage = () => {
     }
   };
 
-    const handleSearch = async () => {
+  const handleSearch = async () => {
     console.log(" Manual search:", query);
     setSearchLoading(true);
     const results = await searchUsers(query);
-
     setUsers(results);
     setSearchLoading(false);
   };
@@ -166,98 +163,93 @@ const EditProfilePage = () => {
     return <Loader title="Loading form..." subtitle="Preparing your profile data" size="lg" />;
 
   return (
-  <SidebarProvider>
-  <div className="flex min-h-dvh w-full flex-col">
+    <SidebarProvider>
+      <div className="flex min-h-dvh w-full flex-col">
 
-    <header className="bg-card sticky top-0 z-50 border-b">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-4 py-2 sm:px-6">
+        <header className="bg-card sticky top-0 z-50 border-b">
+          <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-4 py-2 sm:px-6">
 
-        <Link href="/feed" className="flex items-center gap-2">
-          <div className="w-[50px] h-[50px] rounded-full overflow-hidden">
-            <Image
-              src="/logo.png"
-              alt="Logo"
-              width={50}
-              height={50}
-              className="object-cover w-full h-full scale-150"
-            />
-          </div>
-          <span className="lg:text-lg font-extrabold text-black italic tracking-wider animate-pulse dark:text-slate-600">
-            Zentia
-          </span>
-        </Link>
+            <Link href="/feed" className="flex items-center gap-2">
+              <div className="w-[50px] h-[50px] rounded-full overflow-hidden">
+                <Image
+                  src="/logo.png"
+                  alt="Logo"
+                  width={50}
+                  height={50}
+                  className="object-cover w-full h-full scale-150" />
+              </div>
+              <span className="lg:text-lg font-extrabold text-black italic tracking-wider animate-pulse dark:text-slate-600">
+                Zentia
+              </span>
+            </Link>
 
-        <div className="relative w-full max-w-sm">
-          <SearchBar
-            value={query}
-            onChange={setQuery}
-            onSearch={handleSearch}
-            placeholder="Search users..."
-          />
+            <div className="relative w-full max-w-sm">
+              <SearchBar
+                value={query}
+                onChange={setQuery}
+                onSearch={handleSearch}
+                placeholder="Search users..." />
 
-          {(query || searchLoading) && (
-            <SearchSuggestions users={users} loading={searchLoading} query={query} />
-          )}
-        </div> 
+              {(query || searchLoading) && (
+                <SearchSuggestions users={users} loading={searchLoading} query={query} />
+              )}
+            </div>
 
-        <div className="flex items-center gap-1.5">
-          <NotificationBell />
+            <div className="flex items-center gap-1.5">
+              <NotificationBell />
 
-          <ThemeDropdown
-            trigger={
+              <ThemeDropdown
+                trigger={
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800">
+                    <Moon className="size-5" />
+                  </Button>
+                } />
+
               <Button
-                variant="ghost"
-                size="icon"
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800">
-                <Moon className="size-5" />
+                size="sm"
+                variant="secondary"
+                onClick={() => setOpenPost(true)}
+                className="transition-all duration-200 ease-in-out hover:scale-105 active:scale-95">
+                New Post
               </Button>
-            }/>
-
-          <Button
-            size="sm"
-            variant="secondary"
-            onClick={() => setOpenPost(true)}
-            className="transition-all duration-200 ease-in-out hover:scale-105 active:scale-95">
-            New Post
-          </Button>
-        </div>
-      </div>
-    </header>
-
-    <main className="flex-1">
-
-      <div className="min-h-screen bg-slate-200 text-gray-800 dark:bg-zinc-900 dark:text-gray-300">
-        <div className="max-w-4xl mx-auto px-4 py-10 space-y-6">
-
-      <div className="max-w-4xl mx-auto px-4 pt-6">
-        <Button
-          variant="outline"
-          onClick={handleBack}
-          className="dark:bg-zinc-900 dark:hover:bg-zinc-700 transition-all duration-200 ease-in-out hover:scale-105 active:scale-95 text-md">
-          ← Back
-        </Button>
-      </div>
-
-          <div>
-            <h2 className="text-2xl font-semibold">Edit profile</h2>
-            <p className="text-sm text-slate-400 mt-2 italic">
-              Personal, Account, Security & Notifications. Changes reflect on your profile page.
-            </p>
+            </div>
           </div>
+        </header>
 
+        <main className="flex-1">
+          <div className="min-h-screen bg-slate-200 text-gray-800 dark:bg-zinc-900 dark:text-gray-300">
+            <div className="max-w-4xl mx-auto px-4 py-10 space-y-6">
 
-          <ProfileContent
-            user={user}
-            onSave={handleSave}
-            onCancel={handleBack}
-            isSaving={isSaving}/>
-        </div>
+              <div className="max-w-4xl mx-auto px-4 pt-6">
+                <Button
+                  variant="outline"
+                  onClick={handleBack}
+                  className="dark:bg-zinc-900 dark:hover:bg-zinc-700 transition-all duration-200 ease-in-out hover:scale-105 active:scale-95 text-md">
+                  ← Back
+                </Button>
+              </div>
+
+              <div>
+                <h2 className="text-2xl font-semibold">Edit profile</h2>
+                <p className="text-sm text-slate-400 mt-2 italic">
+                  Personal, Account, Security & Notifications. Changes reflect on your profile page.
+                </p>
+              </div>
+
+              <ProfileContent
+                user={user}
+                onSave={handleSave}
+                onCancel={handleBack}
+                isSaving={isSaving} />
+            </div>
+          </div>
+        </main>
       </div>
-    </main>
-  </div>
-  <CreatePostModal open={openPost} onClose={() => setOpenPost(false)} />
-</SidebarProvider>
+      <CreatePostModal open={openPost} onClose={() => setOpenPost(false)} />
+    </SidebarProvider>
   );
 };
-
 export default EditProfilePage;

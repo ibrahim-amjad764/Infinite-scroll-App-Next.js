@@ -1,9 +1,3 @@
-import LoginForm from './login-form'
-const Login = () => {
-  return (<LoginForm />)
-}
-export default Login
-
 // <div className='relative min-h-screen flex items-center justify-center bg-black text-white'>
 //   <AuthBackgroundShape className='absolute opacity-20' /> {/* subtle background shape */}
 
@@ -43,3 +37,10 @@ export default Login
 //     </CardContent>
 //   </Card>
 // </div>
+
+import LoginForm from './login-form'
+const Login = () => {
+  return (<LoginForm />)
+}
+export default Login
+

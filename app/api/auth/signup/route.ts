@@ -8,10 +8,10 @@ export async function POST(req: Request) {
   try {
     console.log("Signup --- API --- Hit");
 
-    // 🔹 Ensure DB initialization (safe repeated call)
+    // Ensure DB initialization (safe repeated call)
     await initDB();
 
-    // 🔹 Guard against possible null (fix for TS error)
+    // Guard against possible null (fix for TS error)
     if (!AppDataSource) {
       console.error("AppDataSource is null after initDB");
       return NextResponse.json(
@@ -20,18 +20,18 @@ export async function POST(req: Request) {
       );
     }
 
-    // 🔹 Initialize only if not already initialized (prevents duplicate connections)
+    // Initialize only if not already initialized (prevents duplicate connections)
     if (!AppDataSource.isInitialized) {
       console.log("Initializing AppDataSource...");
       await AppDataSource.initialize();
     }
 
-    // 🔹 Create a guaranteed local reference (fixes 'possibly null')
+    // Create a guaranteed local reference (fixes 'possibly null')
     const dataSource = AppDataSource;
 
     const authHeader = req.headers.get("Authorization");
 
-    // 🔹 Validate Authorization header format
+    // Validate Authorization header format
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       console.log("Authorization header missing or invalid");
       return NextResponse.json({ message: "Token Missing" }, { status: 401 });
@@ -44,7 +44,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Token Missing" }, { status: 401 });
     }
 
-    // 🔹 Verify Firebase token
+    // Verify Firebase token
     const decoded = await admin.auth().verifyIdToken(idToken);
 
     console.log("Token Verified:", decoded.uid, "Email:", decoded.email);
@@ -54,10 +54,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    // 🔹 Use safe dataSource reference
+    // Use safe dataSource reference
     const repo = dataSource.getRepository(User);
 
-    // 🔹 Check if user already exists
+    // Check if user already exists
     let user = await repo.findOneBy({ email: decoded.email });
 
     if (user) {
@@ -67,7 +67,7 @@ export async function POST(req: Request) {
 
     console.log("Creating new DB user...");
 
-    // 🔹 Parse first & last name safely (handles single-word names)
+    // Parse first & last name safely (handles single-word names)
     const nameParts = decoded.name?.trim().split(" ") || [];
     const firstName = nameParts[0] || null;
     const lastName =
@@ -84,11 +84,11 @@ export async function POST(req: Request) {
 
     console.log("User Object Before Save:", user);
 
-    // 🔹 Save new user
+    // Save new user
     await repo.save(user);
     console.log("User Saved in DB:", user.email);
 
-    // 🔹 Optional double-check (can be removed in production for performance)
+    // Optional double-check (can be removed in production for performance)
     const savedUser = await repo.findOneBy({ email: user.email });
     console.log("Saved User from DB:", savedUser);
 

@@ -35,7 +35,6 @@ export default function RootLayout({
           console.log('[Layout] Failed to parse session user');
         }
       }
-      
       return null;
     };
 
@@ -56,7 +55,6 @@ export default function RootLayout({
           <Toaster position="top-center" richColors />
         </ReactQueryProvider>
       </body>
-
     </html>
   );
 }

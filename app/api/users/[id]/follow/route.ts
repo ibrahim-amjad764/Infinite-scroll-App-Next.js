@@ -208,9 +208,7 @@ export async function POST(
       );
     }
 
-    /**
-     * Initialize database
-     */
+    /* Initialize database */
     console.log("[FOLLOW API] Initializing DB...");
     await initDB();
 
@@ -219,9 +217,7 @@ export async function POST(
       console.log("[FOLLOW API] AppDataSource initialized");
     }
 
-    /**
-     * Get authenticated user
-     */
+    /* Get authenticated user */
     const currentUser = await getCurrentUser(req);
 
     if (!currentUser) {
@@ -242,9 +238,7 @@ export async function POST(
       );
     }
 
-    /**
-     * Verify target user exists
-     */
+    /* Verify target user exists */
     const userRepo = AppDataSource!.getRepository(User);
     const targetUser = await userRepo.findOneBy({ id: targetUserId });
 
@@ -258,9 +252,7 @@ export async function POST(
 
     console.log("[FOLLOW API] Target user exists:", targetUser.id);
 
-    /**
-     * Check existing follow relationship
-     */
+    /* Check existing follow relationship */
     const followRepo = AppDataSource!.getRepository(Follow);
     const existing = await followRepo.findOne({
       where: {
@@ -277,9 +269,7 @@ export async function POST(
       });
     }
 
-    /**
-     * Create follow record
-     */
+    /* Create follow record */
     console.log("[FOLLOW API] Creating follow relationship");
     const follow = followRepo.create({
       followerId: currentUser.id,
@@ -289,9 +279,7 @@ export async function POST(
     await followRepo.save(follow);
     console.log("[FOLLOW API] Follow saved successfully");
 
-    /**
-     * CREATE NOTIFICATION
-     */
+    /* CREATE NOTIFICATION */
     console.log("[FOLLOW API] Creating follow notification");
 try {
   const notification = await NotificationService.createNotification({
@@ -304,9 +292,7 @@ try {
 } catch (notifErr) {
   console.error("[FOLLOW API] Failed to create notification:", notifErr);
 }
-    /**
-     * Final response
-     */
+    /* Final response */
     return NextResponse.json({
       following: true,
       message: "Followed successfully",

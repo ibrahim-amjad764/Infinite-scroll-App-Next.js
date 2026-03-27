@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { Avatar, AvatarFallback } from "../../../../components/ui/avatar"
-import { Button } from "../../../../components/ui/button"
 import { Textarea } from "../../../../components/ui/textarea"
+import { Button } from "../../../../components/ui/button"
 
 interface Comment {
   id: string;
@@ -83,182 +83,182 @@ const CommentSection = ({ postId, userId }: CommentSectionProps) => {
   }, [postId]);
 
   useEffect(() => {
-  let isActive = true; // prevents state updates after cleanup
+    let isActive = true; // prevents state updates after cleanup
 
-  console.log(`[WebSocket] Effect triggered for postId: ${postId}`);
+    console.log(`[WebSocket] Effect triggered for postId: ${postId}`);
 
-  fetchComments();
+    fetchComments();
 
-  // ✅ Use environment variable for WebSocket URL
-  const WS_BASE_URL = process.env.NEXT_PUBLIC_COMMENTS_WS_URL;
+    //  Use environment variable for WebSocket URL
+    const WS_BASE_URL = process.env.NEXT_PUBLIC_COMMENTS_WS_URL;
 
-  if (!WS_BASE_URL) {
-    console.log("[WebSocket] NEXT_PUBLIC_COMMENTS_WS_URL not set - skipping realtime WebSocket and using HTTP only");
-    setConnectionStatus("disconnected");
+    if (!WS_BASE_URL) {
+      console.log("[WebSocket] NEXT_PUBLIC_COMMENTS_WS_URL not set - skipping realtime WebSocket and using HTTP only");
+      setConnectionStatus("disconnected");
+
+      return () => {
+        isActive = false;
+        if (wsRef.current) {
+          try {
+            wsRef.current.close();
+          } catch (error) {
+            console.error("[WebSocket] Error closing WebSocket during env-disabled cleanup:", error);
+          } finally {
+            wsRef.current = null;
+          }
+        }
+      };
+    }
+
+    console.log(`[WebSocket] Connecting to ${WS_BASE_URL}...`);
+    console.log("[WebSocket] Note: If connection fails, WebSocket server may not be running or URL is incorrect");
+
+    // Use WebSocket with error handling and fallback
+    let ws: WebSocket | null = null;
+
+    try {
+      console.log("[WebSocket] Attempting to create WebSocket connection...");
+      ws = new WebSocket(`${WS_BASE_URL}?userId=${userId}`); // ✅ here we explicitly use env variable
+      wsRef.current = ws;
+      console.log("[WebSocket] WebSocket object created successfully");
+    } catch (error) {
+      console.error("[WebSocket] Failed to create WebSocket:", error);
+      setConnectionStatus("error");
+      console.log("[WebSocket] Falling back to HTTP-only mode - comments will work without real-time updates");
+      return;
+    }
+
+    // -------------------------
+    // OPEN
+    // -------------------------
+    ws.onopen = () => {
+      if (!isActive) return;
+
+      console.log("[WebSocket] Connection established");
+      setConnectionStatus("connected");
+    };
+
+    // -------------------------
+    // MESSAGE
+    // -------------------------
+    ws.onmessage = (event) => {
+      if (!isActive) return;
+
+      console.log("[WebSocket] Raw message received:", event.data);
+
+      try {
+        const response = JSON.parse(event.data);
+
+        if (response.type === 'new_comment') {
+          const newComment = response.comment;
+
+          if (!newComment) {
+            console.error("[WebSocket] No comment data in new_comment message");
+            return;
+          }
+
+          console.log(`[WebSocket] Parsed comment (id: ${newComment.id}) for post: ${newComment.postId}`);
+
+          // Only update if this socket instance is still current
+          if (wsRef.current !== ws) {
+            console.warn("[WebSocket] Stale socket message ignored");
+            return;
+          }
+
+          if (newComment.postId === postId) {
+            // Update the comment section with new comment (without duplicates)
+            setComments((prev) => {
+              if (prev.some((c) => c.id === newComment.id)) return prev; // Avoid duplicates
+              return [newComment, ...prev]; // Add new comment at the top
+            });
+          }
+
+          setIsSending(false);
+        } else if (response.type === 'comment_saved') {
+          // Comment was saved successfully
+          console.log("[WebSocket] Comment saved confirmation received");
+          setIsSending(false);
+        } else if (response.type === 'connection') {
+          // Connection established message
+          console.log("[WebSocket] Connection confirmation received");
+        } else if (response.error) {
+          console.error("[WebSocket] Server error:", response.error);
+          setIsSending(false);
+        } else {
+          // Handle legacy format (direct comment object)
+          const newComment: Comment = response;
+
+          console.log(`[WebSocket] Parsed legacy comment (id: ${newComment.id}) for post: ${newComment.postId}`);
+
+          // Only update if this socket instance is still current
+          if (wsRef.current !== ws) {
+            console.warn("[WebSocket] Stale socket message ignored");
+            return;
+          }
+
+          if (newComment.postId === postId) {
+            // Update the comment section with new comment (without duplicates)
+            setComments((prev) => {
+              if (prev.some((c) => c.id === newComment.id)) return prev; // Avoid duplicates
+              return [newComment, ...prev]; // Add new comment at the top
+            });
+          }
+
+          setIsSending(false);
+        }
+      } catch (error) {
+        console.error("[WebSocket] JSON parse error:", error);
+        setIsSending(false);
+      }
+    };
+
+    // -------------------------
+    // ERROR
+    // -------------------------
+    ws.onerror = (error) => {
+      if (!isActive) return;
+
+      // Silent handling - WebSocket server not running is expected behavior
+      console.log("[WebSocket] WebSocket server not available - using HTTP fallback");
+      setConnectionStatus("disconnected");
+    };
+
+    // -------------------------
+    // CLOSE
+    // -------------------------
+    ws.onclose = (event) => {
+      if (!isActive) return;
+
+      console.log(
+        `[WebSocket] Connection closed (code: ${event.code}, reason: ${event.reason})`
+      );
+
+      setConnectionStatus("disconnected");
+    };
 
     return () => {
+      console.log(
+        `[WebSocket] Cleaning up connection for postId: ${postId}`
+      );
+
       isActive = false;
-      if (wsRef.current) {
+
+      if (wsRef.current === ws && ws) {
+        console.log("[WebSocket] Setting wsRef.current to null");
+        wsRef.current = null;
+      }
+
+      // Always close — safe even if CONNECTING
+      if (ws) {
+        console.log("[WebSocket] Closing WebSocket connection");
         try {
-          wsRef.current.close();
+          ws.close();
         } catch (error) {
-          console.error("[WebSocket] Error closing WebSocket during env-disabled cleanup:", error);
-        } finally {
-          wsRef.current = null;
+          console.error("[WebSocket] Error closing WebSocket:", error);
         }
       }
     };
-  }
-
-  console.log(`[WebSocket] Connecting to ${WS_BASE_URL}...`);
-  console.log("[WebSocket] Note: If connection fails, WebSocket server may not be running or URL is incorrect");
-
-  // Use WebSocket with error handling and fallback
-  let ws: WebSocket | null = null;
-
-  try {
-    console.log("[WebSocket] Attempting to create WebSocket connection...");
-    ws = new WebSocket(`${WS_BASE_URL}?userId=${userId}`); // ✅ here we explicitly use env variable
-    wsRef.current = ws;
-    console.log("[WebSocket] WebSocket object created successfully");
-  } catch (error) {
-    console.error("[WebSocket] Failed to create WebSocket:", error);
-    setConnectionStatus("error");
-    console.log("[WebSocket] Falling back to HTTP-only mode - comments will work without real-time updates");
-    return;
-  }
-
-  // -------------------------
-  // OPEN
-  // -------------------------
-  ws.onopen = () => {
-    if (!isActive) return;
-
-    console.log("[WebSocket] Connection established");
-    setConnectionStatus("connected");
-  };
-
-  // -------------------------
-  // MESSAGE
-  // -------------------------
-  ws.onmessage = (event) => {
-    if (!isActive) return;
-
-    console.log("[WebSocket] Raw message received:", event.data);
-
-    try {
-      const response = JSON.parse(event.data);
-
-      if (response.type === 'new_comment') {
-        const newComment = response.comment;
-
-        if (!newComment) {
-          console.error("[WebSocket] No comment data in new_comment message");
-          return;
-        }
-
-        console.log(`[WebSocket] Parsed comment (id: ${newComment.id}) for post: ${newComment.postId}`);
-
-        // Only update if this socket instance is still current
-        if (wsRef.current !== ws) {
-          console.warn("[WebSocket] Stale socket message ignored");
-          return;
-        }
-
-        if (newComment.postId === postId) {
-          // Update the comment section with new comment (without duplicates)
-          setComments((prev) => {
-            if (prev.some((c) => c.id === newComment.id)) return prev; // Avoid duplicates
-            return [newComment, ...prev]; // Add new comment at the top
-          });
-        }
-
-        setIsSending(false);
-      } else if (response.type === 'comment_saved') {
-        // Comment was saved successfully
-        console.log("[WebSocket] Comment saved confirmation received");
-        setIsSending(false);
-      } else if (response.type === 'connection') {
-        // Connection established message
-        console.log("[WebSocket] Connection confirmation received");
-      } else if (response.error) {
-        console.error("[WebSocket] Server error:", response.error);
-        setIsSending(false);
-      } else {
-        // Handle legacy format (direct comment object)
-        const newComment: Comment = response;
-
-        console.log(`[WebSocket] Parsed legacy comment (id: ${newComment.id}) for post: ${newComment.postId}`);
-
-        // Only update if this socket instance is still current
-        if (wsRef.current !== ws) {
-          console.warn("[WebSocket] Stale socket message ignored");
-          return;
-        }
-
-        if (newComment.postId === postId) {
-          // Update the comment section with new comment (without duplicates)
-          setComments((prev) => {
-            if (prev.some((c) => c.id === newComment.id)) return prev; // Avoid duplicates
-            return [newComment, ...prev]; // Add new comment at the top
-          });
-        }
-
-        setIsSending(false);
-      }
-    } catch (error) {
-      console.error("[WebSocket] JSON parse error:", error);
-      setIsSending(false);
-    }
-  };
-
-  // -------------------------
-  // ERROR
-  // -------------------------
-  ws.onerror = (error) => {
-    if (!isActive) return;
-
-    // Silent handling - WebSocket server not running is expected behavior
-    console.log("[WebSocket] WebSocket server not available - using HTTP fallback");
-    setConnectionStatus("disconnected"); 
-  };
-
-  // -------------------------
-  // CLOSE
-  // -------------------------
-  ws.onclose = (event) => {
-    if (!isActive) return;
-
-    console.log(
-      `[WebSocket] Connection closed (code: ${event.code}, reason: ${event.reason})`
-    );
-
-    setConnectionStatus("disconnected");
-  };
-
-  return () => {
-    console.log(
-      `[WebSocket] Cleaning up connection for postId: ${postId}`
-    );
-
-    isActive = false;
-
-    if (wsRef.current === ws && ws) {
-      console.log("[WebSocket] Setting wsRef.current to null");
-      wsRef.current = null;
-    }
-
-    // Always close — safe even if CONNECTING
-    if (ws) {
-      console.log("[WebSocket] Closing WebSocket connection");
-      try {
-        ws.close();
-      } catch (error) {
-        console.error("[WebSocket] Error closing WebSocket:", error);
-      }
-    }
-  };
-}, [postId, fetchComments]);
+  }, [postId, fetchComments]);
 
   const postComment = async () => {
     if (!content.trim()) {
@@ -271,13 +271,13 @@ const CommentSection = ({ postId, userId }: CommentSectionProps) => {
     // Check if WebSocket is connected, fallback to HTTP if not
     if (!ws || ws.readyState !== WebSocket.OPEN) {
       console.log("[Comments] WebSocket not connected, using HTTP fallback");
-      setConnectionStatus("disconnected"); 
-      
+      setConnectionStatus("disconnected");
+
       // HTTP fallback for posting comments
       try {
         setIsSending(true);
         console.log("[Comments] Posting comment via HTTP...");
-        
+
         const response = await fetch('/api/posts/comment', {
           method: 'POST',
           headers: {
@@ -304,18 +304,18 @@ const CommentSection = ({ postId, userId }: CommentSectionProps) => {
       }
       return;
     }
-    
+
     console.log("[WebSocket] Sending comment...");
     setIsSending(true);
 
     try {
       // Send comment to the WebSocket server
       ws.send(
-        JSON.stringify({ 
+        JSON.stringify({
           type: "comment",
-          postId, 
-          content: content.trim(), 
-          userId 
+          postId,
+          content: content.trim(),
+          userId
         })
       );
 
@@ -349,16 +349,8 @@ const CommentSection = ({ postId, userId }: CommentSectionProps) => {
         <h3 className="text-l italic font-semibold text-gray-900 dark:text-white">Comments</h3>
         <span
           className={`text-xs px-3 py-1 rounded-full font-medium ${connectionStatus === "connected"
-            ? "bg-green-500 text-white"
-            : connectionStatus === "connecting"
-              ? "bg-yellow-500 text-white"
-              : "bg-red-500 text-white"} transition-all duration-300`}
-        >
-          {connectionStatus === "connected"
-            ? "● Live"
-            : connectionStatus === "connecting"
-              ? "Connecting..."
-              : "Disconnected"}
+            ? "bg-green-500 text-white" : connectionStatus === "connecting" ? "bg-yellow-500 text-white" : "bg-red-500 text-white"} transition-all duration-300`}>
+          {connectionStatus === "connected" ? "● Live" : connectionStatus === "connecting" ? "Connecting..." : "Disconnected"}
         </span>
       </div>
 
@@ -376,7 +368,7 @@ const CommentSection = ({ postId, userId }: CommentSectionProps) => {
           <div className="text-center text-gray-500 text-sm">No comments yet. Be the first to comment!</div>
         ) : (
           comments.map((comment, index) => (
-  <div key={comment.id ?? `comment-${index}`} className="space-y-2">
+            <div key={comment.id ?? `comment-${index}`} className="space-y-2">
               <div className="flex gap-4 items-start p-1 bg-gray-100 dark:bg-zinc-800 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 ease-in-out">
                 <Avatar className="w-10 h-10">
                   <AvatarFallback>{comment.user.firstName?.[0]?.toUpperCase() || "U"}</AvatarFallback>
@@ -406,15 +398,14 @@ const CommentSection = ({ postId, userId }: CommentSectionProps) => {
         )}
       </div>
 
-      <div className="mt text-sm text-gray-500 italic "> 
+      <div className="mt text-sm text-gray-500 italic ">
         <TextareaButton
           value={content}
           onChange={(e) => setContent(e.target.value)}
           onSend={handleCommentButtonClick}
           disabled={isSending}
           onKeyDown={handleKeyPress}
-          placeholder="Write a comment... (Press Enter to send)"
-        />
+          placeholder="Write a comment... (Press Enter to send)" />
       </div>
     </div>
   );

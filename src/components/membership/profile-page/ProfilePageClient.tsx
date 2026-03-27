@@ -1,14 +1,14 @@
 "use client";
 
-import React from "react";
-import InfiniteScroll from "react-infinite-scroll-component";
+import { FollowButton } from "../profile-page/FollowButton";
 import { Loader2 } from "lucide-react";
 import { Card } from "../../../../components/ui/card";
-import Link from "next/link";
-
+import InfiniteScroll from "react-infinite-scroll-component";
 import ProfileHeader from "./ProfileHeader";
 import ProfileContent from "./ProfileContent";
-import { FollowButton } from "../profile-page/FollowButton";
+import React from "react";
+import Link from "next/link";
+
 interface User {
   id: string;
   firstName?: string;
@@ -102,15 +102,15 @@ export default function ProfilePageClient({
     <div className="mx-auto max-w-3xl p-6 space-y-6">
       {/* Profile Header */}
       <ProfileHeader user={user} />
-<div className="space-y-6">
-  <h3 className="text-xl sm:text-2xl font-semibold text-slate-800 dark:text-gray-300">
-    Posts by {user.firstName || "User"} ({posts.length})
-  </h3>
-  {/* Follow button for the profile being viewed */}
-  <div className="my-2">
-  <FollowButton userId={user.id} />
-</div>
-  {posts.length === 0 ? (
+      <div className="space-y-6">
+        <h3 className="text-xl sm:text-2xl font-semibold text-slate-800 dark:text-gray-300">
+          Posts by {user.firstName || "User"} ({posts.length})
+        </h3>
+        {/* Follow button for the profile being viewed */}
+        <div className="my-2">
+          <FollowButton userId={user.id} />
+        </div>
+        {posts.length === 0 ? (
           <p className="text-center text-gray-400 italic">No posts yet.</p>
         ) : (
           <InfiniteScroll
@@ -119,14 +119,12 @@ export default function ProfilePageClient({
             hasMore={hasMore}
             scrollThreshold={0.9}
             loader={<Loader2 className="h-6 w-6 animate-spin my-4 flex mx-auto" />}
-            endMessage={<p className="text-center text-gray-600 italic mt-4">No more posts.</p>}
-          >
+            endMessage={<p className="text-center text-gray-600 italic mt-4">No more posts.</p>}>
             <div className="space-y-4">
               {posts.map((post) => (
                 <Card
                   key={`post-${post.id}`}
-                  className="p-4 bg-white border border-gray-200 shadow-sm dark:bg-zinc-800"
-                >
+                  className="p-4 bg-white border border-gray-200 shadow-sm dark:bg-zinc-800" >
                   {/* User Info */}
                   <Link href={`/profile/${post.user.id}`} className="flex items-center space-x-2 mb-2 cursor-pointer">
                     {post.user.avatarUrl ? (
@@ -177,7 +175,7 @@ export default function ProfilePageClient({
       </div>
 
       {/* Edit Profile Section */}
-      {editable && <ProfileContent user={user} onSave={async () => {}} onCancel={() => {}} isSaving={false} />}
+      {editable && <ProfileContent user={user} onSave={async () => { }} onCancel={() => { }} isSaving={false} />}
     </div>
   );
 }

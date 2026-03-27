@@ -1,14 +1,14 @@
 //src/component/memebership/profile-page/profilecontent
 "use client";
 
-import { useState } from "react";
-import { Shield, Key, Trash2 } from "lucide-react";
-import { Button } from "../../../../components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../../components/ui/card";
-import { Label } from "../../../../components/ui/label";
-import { Separator } from "../../../../components/ui/separator";
-import { Switch } from "../../../../components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../components/ui/tabs";
+import { Shield, Key, Trash2 } from "lucide-react";
+import { Separator } from "../../../../components/ui/separator";
+import { useState } from "react";
+import { Button } from "../../../../components/ui/button";
+import { Switch } from "../../../../components/ui/switch";
+import { Label } from "../../../../components/ui/label";
 import { Badge } from "../../../../components/ui/badge";
 import { toast } from "sonner";
 import EditProfileForm from "./EditProfileForm";

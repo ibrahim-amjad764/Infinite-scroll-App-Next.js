@@ -44,7 +44,6 @@
 
 import { useNotificationStore } from "../store/notificationStore";
 
-
 let socket: WebSocket | null = null;
 let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
 let reconnectAttempts = 0;

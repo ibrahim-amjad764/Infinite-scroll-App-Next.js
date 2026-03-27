@@ -116,5 +116,4 @@ function initializeFirebaseAdmin(): void {
 }
 
 initializeFirebaseAdmin();
-
 export default admin;

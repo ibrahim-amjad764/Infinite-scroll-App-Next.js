@@ -1,9 +1,9 @@
 import { useMemo, useState } from "react";
+import { Textarea } from "../../../../components/ui/textarea";
 import { Button } from "../../../../components/ui/button";
 import { Input } from "../../../../components/ui/input";
-import { Textarea } from "../../../../components/ui/textarea";
-import { Card } from "../../../../components/ui/card";
 import { toast } from "sonner";
+import { Card } from "../../../../components/ui/card";
 
 interface EditProfileFormProps {
   user: {
@@ -142,7 +142,6 @@ const EditProfileForm = ({ user, onSave, onCancel, isSaving }: EditProfileFormPr
       toast.error("Failed to save profile");
     }
   };
-
 
   return (
     <Card className="p-6 bg-white backdrop-blur-lg shadow-lg rounded-lg border-4 border-gray-100 dark:border-white dark:bg-zinc-900/80 dark:border-zinc-700/50">

@@ -23,7 +23,7 @@ export default function UserProfileCard({
   editable = false,
   onEdit,
 }: UserProfileCardProps) {
-  // ✅ Log to verify the dynamic user is rendering
+  //  Log to verify the dynamic user is rendering
   console.log("[UserProfileCard] Rendering user:", user.id, user.firstName);
 
   // Safely build full name
@@ -37,8 +37,7 @@ export default function UserProfileCard({
           <img
             src={user.avatarUrl}
             alt={`${fullName} avatar`}
-            className="w-20 h-20 rounded-full object-cover"
-          />
+            className="w-20 h-20 rounded-full object-cover" />
         ) : (
           <div className="w-20 h-20 rounded-full bg-gray-300 flex items-center justify-center text-xl font-bold text-white">
             {user.firstName?.[0] || "U"}
@@ -76,8 +75,7 @@ export default function UserProfileCard({
         {editable && onEdit && (
           <button
             onClick={onEdit}
-            className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800 transition"
-          >
+            className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800 transition"  >
             Edit Profile
           </button>
         )}

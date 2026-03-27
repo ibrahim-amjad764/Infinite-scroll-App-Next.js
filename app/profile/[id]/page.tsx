@@ -189,9 +189,7 @@
 //   }
 // }
 
-
 "use server";
-
 import { notFound } from "next/navigation";
 import { AppDataSource } from "../../../src/db/data-source";
 import { initDB } from "../../../src/db/init-db";
@@ -220,7 +218,7 @@ const dedupeUsers = (users: UserEntity[] = []) => {
 };
 
 export default async function UserProfilePage(props: ProfilePageProps) {
-  // ⚠️ Unwrap params because it might be a Promise
+  // Unwrap params because it might be a Promise
   const { id } = await props.params;
 
   // Initialize DB if not done
@@ -340,8 +338,7 @@ export default async function UserProfilePage(props: ProfilePageProps) {
         comments={mappedComments}
         likes={mappedLikes}
         followers={followers}
-        following={following}
-      />
+        following={following}/>
     </div>
   );
 }

@@ -48,16 +48,15 @@
 //   );
 // }
 
-
 "use client"
 
-import Link from "next/link"
-import Image from "next/image";
-import { motion } from "framer-motion"
-import { useStore } from "../src/store/useStore"
-import { Button } from "../components/ui/button"
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../components/ui/card"
 import { useEffect } from "react"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle} from "../components/ui/card"
+import { useStore } from "../src/store/useStore"
+import { motion } from "framer-motion"
+import { Button } from "../components/ui/button"
+import Image from "next/image";
+import Link from "next/link"
 
 export default function Home() {
   useEffect(() => {
@@ -71,22 +70,19 @@ export default function Home() {
     <>
       <main
         className={`relative flex min-h-screen items-center justify-center px-6 transition-all duration-500 ${darkMode
-            ? "bg-linear-to-br from-gray-950 via-gray-900 to-gray-800"
-            : "bg-linear-to-br from-slate-100 via-white to-slate-200"
-          }`}
-      >
+          ? "bg-linear-to-br from-gray-950 via-gray-900 to-gray-800"
+          : "bg-linear-to-br from-slate-100 via-white to-slate-200"
+          }`} >
         {/* Glow Background Effect */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute -top-40 -left-40 w-96 h-96 bg-purple-500/20 blur-3xl rounded-full" />
           <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-blue-500/20 blur-3xl rounded-full" />
         </div>
-
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="relative z-10"
-        >
+          className="relative z-10">
           <Card className="w-full max-w-md backdrop-blur-xl bg-white/70 dark:bg-white/5 border border-white/15 shadow-3xl rounded-3xl">
             <CardHeader className="text-center space-y-4 pb-6">
               <div className="mx-auto w-18 h-18 rounded-2xl bg-linear-to-br from-[#458B73] to-[#09637E] flex items-center justify-center shadow-lg overflow-hidden relative">
@@ -94,10 +90,9 @@ export default function Home() {
                   src="/logo.png"
                   alt="Logo"
                   fill
-                  className="object-cover"
-                />
+                  className="object-cover" />
               </div>
-             <p className="text-3xl sm:text-3xl lg:text-4xl font-extrabold text-transparent bg-clip-text bg-linear-to-br from-[#458B73] to-[#09637E] italic tracking-wider animate-pulse "> Zentia: Share & Connect </p>
+              <p className="text-3xl sm:text-3xl lg:text-4xl font-extrabold text-transparent bg-clip-text bg-linear-to-br from-[#458B73] to-[#09637E] italic tracking-wider animate-pulse "> Zentia: Share & Connect </p>
 
               <CardTitle className="text-3xl font-extrabold tracking-tight">
                 Welcome to

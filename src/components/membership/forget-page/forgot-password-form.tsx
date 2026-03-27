@@ -1,13 +1,13 @@
 "use client"
 
+import { getAuth, sendPasswordResetEmail } from "firebase/auth"
 import { useEffect, useState } from "react"
 import { MailIcon } from "lucide-react"
 import { Button } from "@components/ui/button"
+import { motion } from "framer-motion"
 import { Label } from "@components/ui/label"
 import { toast } from "sonner"
-import { getAuth, sendPasswordResetEmail } from "firebase/auth"
 import { app } from "@/lib/firebase"
-import { motion } from "framer-motion"
 
 const ForgotPasswordForm = () => {
 

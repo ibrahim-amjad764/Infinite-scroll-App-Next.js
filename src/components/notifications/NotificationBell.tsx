@@ -140,9 +140,6 @@
 
 
 
-
-
-
 "use Client";
 
 import { useEffect, useState, useRef } from "react";
@@ -277,7 +274,6 @@ export function NotificationBell() {
 
  return (
     <div className="relative">
-      {/* Main notification button with enhanced accessibility */}
       <button
         onClick={() => setOpen((prev) => !prev)}
         className="relative group transition-transform duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-full"
@@ -285,7 +281,6 @@ export function NotificationBell() {
         aria-haspopup="true"
         aria-expanded={open}
       >
-        {/* Premium bell icon with enhanced hover states */}
         <Bell
           className={`h-6 w-6 text-gray-600 transition-all duration-300 group-hover:text-blue-600 group-active:scale-95 ${shake ? "animate-premium-shake" : ""
             }`}
@@ -295,18 +290,16 @@ export function NotificationBell() {
           strokeWidth={2}
         />
 
-       {/* Simple notification badge - WITH BOUNCE ANIMATION */}
         {unreadCount > 0 && (
           <span
-            className={`absolute -top-1.5 -right-1.5 min-w-[20px] h-5 text-xs font-bold bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-full flex items-center justify-center px-1.5 shadow-lg transition-all duration-300  ${
+            className={`absolute -top-1.5 -right-1.5 min-w-[20px] h-5 text-xs font-bold bg-gradient-to-r from-red-500 to-pink-600 text-white rounded-full flex items-center justify-center px-1.5 shadow-lg transition-all duration-300  ${
               bounce || continuousBounce ? "slow-bounce" : ""
             }`}
             // style={{
             //   animation: (bounce || continuousBounce) ? 'premium-bounce 6s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite' : 'none'
             // }}
             role="status"
-            aria-label={`${unreadCount} unread notifications`}
-         >
+            aria-label={`${unreadCount} unread notifications`}>
             {unreadCount > 99 ? "99+" : unreadCount}
           </span>
         )}
@@ -317,16 +310,12 @@ export function NotificationBell() {
         )}
       </button>
 
-     
-
-      {/* Notification dropdown with backdrop blur effect */}
       {open && (
         <>
           <div
             className="fixed inset-0  bg-opacity-20 "
             onClick={() => setOpen(false)}
-            aria-label="Close notifications"
-          />
+            aria-label="Close notifications"/>
           <NotificationDropdown onClose={() => setOpen(false)} />
         </>
       )}

@@ -72,32 +72,32 @@
 // app/profile/page.tsx
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
-import ProfileCard from "../../src/components/membership/profile-page/ProfileCard";
-import ProfileHeader from "../../src/components/membership/profile-page/ProfileHeader";
-import Loader from "../../components/ui/Loader";
-import { getAuth, getIdToken } from "firebase/auth";
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { fetchUserProfile, fetchMyPosts } from "../../app/api/profile-user/user";
-import { Button } from "../../components/ui/button";
-import { SidebarProvider } from "../../components/ui/sidebar";
+import { useState, useEffect } from "react";
+import { getAuth, getIdToken } from "firebase/auth";
 import { NotificationBell } from "../../src/components/notifications/NotificationBell";
-import ThemeDropdown from "../../components/ui/dropdown-theme";
-import ProfileDropdown from "../../components/ui/dropdown-profile";
+import { SidebarProvider } from "../../components/ui/sidebar";
 import { CreatePostModal } from "../../src/components/posts/CreatePostModal";
-import Image from "next/image";
-import { Avatar } from "../../components/ui/avatar";
+import { useSearchParams } from "next/navigation";
 import { AvatarFallback } from "@radix-ui/react-avatar";
-import { Moon } from "lucide-react";
-import Link from "next/link";
-import ProfileContent from "../../src/components/membership/profile-page/ProfileContent";
-import SearchBar from "../../src/components/notifications/SearchBar";
-import SearchSuggestions from "../../src/components/notifications/SearchSuggestions";
 import { searchUsers } from "../../src/services/user.service";
 import { useDebounce } from "../../src/lib/useDebounce";
-import { useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { Avatar } from "../../components/ui/avatar";
+import { Button } from "../../components/ui/button";
+import { toast } from "sonner";
+import { Moon } from "lucide-react";
+import SearchSuggestions from "../../src/components/notifications/SearchSuggestions";
+import ProfileDropdown from "../../components/ui/dropdown-profile";
+import ProfileContent from "../../src/components/membership/profile-page/ProfileContent";
+import ProfileHeader from "../../src/components/membership/profile-page/ProfileHeader";
+import ThemeDropdown from "../../components/ui/dropdown-theme";
+import ProfileCard from "../../src/components/membership/profile-page/ProfileCard";
+import SearchBar from "../../src/components/notifications/SearchBar";
+import Loader from "../../components/ui/Loader";
+import Image from "next/image";
+import Link from "next/link";
 
 interface User {
   id: string;
@@ -260,7 +260,6 @@ const debouncedQuery = useDebounce(query, 400);
   fetchUsers();
 }, [debouncedQuery]);
 
-
   useEffect(() => {
     document.title = "Profile | My Next JS App";
   }, []);
@@ -366,8 +365,7 @@ const debouncedQuery = useDebounce(query, 400);
             value={query}
             onChange={setQuery}
             onSearch={handleSearch}
-            placeholder="Search users..."
-          />
+            placeholder="Search users..." />
 
           {(query || searchLoading) && (
             <SearchSuggestions users={users} loading={searchLoading} query={query} />
@@ -391,7 +389,6 @@ const debouncedQuery = useDebounce(query, 400);
           </div>
         </header>
 
-        
         <main className="flex-1 mt-4"> {/* ← mt-4 adds space under navbar */}
           <div className="min-h-screen bg-slate-100 text-gray-900 dark:bg-zinc-950">
             <div className="w-full px-10 py-10 space-y-6">

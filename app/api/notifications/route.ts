@@ -28,8 +28,6 @@
 //   }
 // }
 
-
-
 // src/app/api/notifications/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "../../../src/lib/auth";
@@ -38,7 +36,6 @@ import { Notification } from "../../../src/entities/notification";
 import "@/lib/notificationWsServer";
 
 export const runtime = "nodejs";
-
 /* GET /api/notifications  -- get all notification */
 export async function GET(req: NextRequest) {
   console.log("[Notifications API] GET called");
@@ -84,7 +81,6 @@ export async function GET(req: NextRequest) {
     );
   }
 }
-
 
 async function getUserNotificationsHandler(userId: string) {
   if (!AppDataSource) {

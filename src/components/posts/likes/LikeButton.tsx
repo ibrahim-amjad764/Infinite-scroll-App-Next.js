@@ -1,10 +1,10 @@
 "use client";
 
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Button } from "../../../../components/ui/button";
-import { Heart } from "lucide-react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";  // Import framer-motion
+import { Heart } from "lucide-react";
 
 interface LikeButtonProps {
   postId: string;

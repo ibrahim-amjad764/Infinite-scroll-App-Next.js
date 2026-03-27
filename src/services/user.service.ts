@@ -33,6 +33,7 @@
 //   await api.delete(`/users/${id}`);
 // };
 
+
 import { UserDTO } from "@/types/users";
 
 // CREATE user
@@ -107,7 +108,7 @@ export const searchUsers = async (query: string) => {
 
     console.log(" Response status:", res.status);
 
-    const text = await res.text(); // 👈 IMPORTANT DEBUG
+    const text = await res.text(); //  IMPORTANT DEBUG
     console.log(" Raw response:", text);
 
     if (!res.ok) {
@@ -118,7 +119,7 @@ export const searchUsers = async (query: string) => {
 
     return data.users;
   } catch (error) {
-    console.error("❌ searchUsers error:", error);
+    console.error(" searchUsers error:", error);
     return [];
   }
 };

@@ -7,5 +7,4 @@
 //     <span className="text-xl font-semibold">shadcn/studio</span>
 //   </div>
 // )
-
 // export default Logo

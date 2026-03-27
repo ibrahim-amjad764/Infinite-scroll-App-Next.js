@@ -1,9 +1,9 @@
-import { NextRequest } from "next/server";
-import admin from "./firebase-admin";
-import { initDB } from "../db/init-db";
 import { AppDataSource } from "../db/data-source";
-import { User } from "../entities/user";
 import { Notification } from "../entities/notification"; 
+import { NextRequest } from "next/server";
+import { initDB } from "../db/init-db";
+import { User } from "../entities/user";
+import admin from "./firebase-admin";
 /**
  * Get authenticated user from Firebase cookie
  * Used by all protected API routes

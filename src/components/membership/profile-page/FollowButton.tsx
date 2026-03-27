@@ -16,7 +16,7 @@ export const FollowButton: React.FC<FollowButtonProps> = ({
 }) => {
   const [following, setFollowing] = useState<boolean | null>(initialFollowing ? true : null);
   const [loading, setLoading] = useState(false);
-  const [initialLoading, setInitialLoading] = useState(initialFollowing ? false : true);
+  const [initialLoading, setInitialLoading] = useState(false); // Skip initial loading animation
 
   // Fetch initial follow status only if not provided
   useEffect(() => {
@@ -80,7 +80,7 @@ export const FollowButton: React.FC<FollowButtonProps> = ({
       aria-label={following ? "Unfollow user" : "Follow user"}
       className={`
         relative flex items-center gap-2 px-2 py-2 rounded-full font-medium
-        transition-all duration-300 transform
+        
         ${following === null ? "bg-gray-200 text-gray-500" : following ? "bg-gray-100 text-green-600 border border-gray-300 hover:bg-gray-200" : "bg-cyan-900 text-white hover:bg-cyan-700"}
         ${loading || initialLoading ? "cursor-not-allowed opacity-70" : "cursor-pointer"}
         shadow-md hover:shadow-lg

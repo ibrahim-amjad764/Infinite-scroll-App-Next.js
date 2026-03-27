@@ -28,7 +28,7 @@ export const SkeletonLoader = () => (
          <div className="flex flex-row items-center justify-center gap-32 mt-1 px-2 py-3">
           <Skeleton className="h-8 w-12 rounded-full " /> {/* Like */}
           <Skeleton className="h-8 w-16 rounded-full" /> {/* Comment */}
-          <Skeleton className="h-8 w-12 rounded-full" /> {/* Share */}
+          {/* <Skeleton className="h-8 w-12 rounded-full" /> Share */}
         </div>
       </Card>
     ))}

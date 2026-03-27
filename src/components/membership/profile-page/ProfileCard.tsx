@@ -129,7 +129,7 @@ interface Post {
   content: string;
   images?: string[];
   createdAt: string;
-  likesCount: number;
+  likesCount?: number;
   comments?: Comment[];
 }
 

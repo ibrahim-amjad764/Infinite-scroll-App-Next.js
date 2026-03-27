@@ -276,6 +276,8 @@ import { LikeButton } from "../../src/components/posts/likes/LikeButton";
 import { ShareButton } from "../../src/components/posts/Share/ShareButton";
 import { FollowButton } from "../../src/components/membership/profile-page/FollowButton";
 import { NotificationBell } from "../../src/components/notifications/NotificationBell";
+import { searchUsers } from "../../src/services/user.service";
+import { useDebounce } from "../../src/lib/useDebounce";
 import Image from "next/image";
 import Link from "next/link"; // Import Link here
 import InfiniteScroll from "react-infinite-scroll-component";
@@ -284,8 +286,6 @@ import ProfileDropdown from "../../components/ui/dropdown-profile";
 import CommentSection from "../../src/components/posts/comments/CommentSection";
 import SearchBar from "../../src/components/notifications/SearchBar"
 import SearchSuggestions from "../../src/components/notifications/SearchSuggestions";
-import { searchUsers } from "../../src/services/user.service";
-import { useDebounce } from "../../src/lib/useDebounce";
 
 // FeedPost displaying content and comments
 const FeedPost = ({
@@ -368,11 +368,11 @@ const FeedPost = ({
             loading="eager" />
           {post.images.length > 1 && (
             <div className="absolute inset-0 flex items-center justify-between px-2">
-              <Button size="sm" variant="secondary" onClick={() => prevImage(post.id)} disabled={activeIndex === 0}>
+              <Button size="default" variant="secondary" onClick={() => prevImage(post.id)} disabled={activeIndex === 0}> 
                 ‹
               </Button>
               <Button
-                size="sm"
+                size="default"
                 variant="secondary"
                 onClick={() => nextImage(post.id, post.images?.length ?? 0)}
                 disabled={activeIndex === (post.images?.length ?? 0) - 1} >
@@ -642,7 +642,7 @@ export default function FeedPage() {
               <div className="w-[50px] h-[50px] rounded-full overflow-hidden">
                 <Image src="/logo.png" alt="Logo" width={50} height={50} className="object-cover w-full h-full scale-150" />
               </div>
-              <span className="lg:text-lg font-extrabold text-black italic tracking-wider animate-pulse"> Zentia </span>
+              <span className="lg:text-lg font-extrabold text-black italic tracking-wider animate-pulse dark:text-slate-600"> Zentia </span>
             </Link>
             <div className="relative w-full max-w-sm">
               <SearchBar
@@ -652,7 +652,6 @@ export default function FeedPage() {
                 placeholder="Search users..."
               />
 
-              {/* 🔥 Suggestions dropdown */}
               {(query || searchLoading) && (
                 <SearchSuggestions users={users} loading={searchLoading} query={query} />
               )}

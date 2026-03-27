@@ -69,6 +69,19 @@ export const LikeButton = ({
       setLikesCount(data.likesCount);
       console.log(`[Like] Post: ${postId}, User: ${userId}, Action: ${data.action}, Likes: ${data.likesCount}`);
       queryClient.invalidateQueries({ queryKey: ["post", postId] });
+      queryClient.setQueryData(["posts"], (oldData: any) => {
+      console.log("[Cache Update] Updating posts cache");
+
+  return oldData?.map((post: any) => {
+    if (post.id === postId) {
+      return {
+        ...post,
+        likesCount: data.likesCount,
+      };
+    }
+    return post;
+  });
+});
     },
 
     onError: (error, _, context) => {

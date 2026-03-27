@@ -97,7 +97,7 @@ export default function Home() {
                   className="object-cover"
                 />
               </div>
-             <p className="text-3xl sm:text-3xl lg:text-4xl font-extrabold text-transparent bg-clip-text bg-linear-to-br from-[#458B73] to-[#09637E] italic tracking-wider animate-pulse"> Zentia: Share & Connect </p>
+             <p className="text-3xl sm:text-3xl lg:text-4xl font-extrabold text-transparent bg-clip-text bg-linear-to-br from-[#458B73] to-[#09637E] italic tracking-wider animate-pulse "> Zentia: Share & Connect </p>
 
               <CardTitle className="text-3xl font-extrabold tracking-tight">
                 Welcome to

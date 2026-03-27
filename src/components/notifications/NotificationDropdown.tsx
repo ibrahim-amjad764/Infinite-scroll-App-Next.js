@@ -163,7 +163,7 @@
 
 
 // "use client";
-
+//  I want to make  dropdown is closed on only X button when i clicked on  anywhere that closed the notification drop down easily closed or make responsive page
 import { NotificationItem } from "./NotificationItem";
 import { useNotificationStore, Notification as StoreNotification } from "../../store/notificationStore";
 import api from "../../lib/api";
@@ -254,7 +254,7 @@ export function NotificationDropdown({ onClose }: Props) {
     </button>
   </div>
 
-  <div className="flex items-center justify-between px-5 py-2 text-xs bg-gradient-to-r from-gray-50 to-transparent dark:from-zinc-800">
+  <div className="flex items-center justify-between px-5 py-2 text-xs bg-linear-to-r from-gray-50 to-transparent dark:from-zinc-800">
     <span className="text-gray-500 italic">
       {wsStatus === "connected" ? "Real-time updates active" : "Offline mode"}
     </span>
@@ -283,7 +283,7 @@ export function NotificationDropdown({ onClose }: Props) {
       <div
         key={n.id}
         className={`relative group px-5 py-4 flex gap-3 items-start transition-all duration-200 border-b last:border-none border-gray-100 dark:border-zinc-800
-        hover:bg-gradient-to-r hover:from-gray-50 hover:to-transparent dark:hover:from-zinc-800
+        hover:bg-linear-to-r hover:from-gray-50 hover:to-transparent dark:hover:from-zinc-800
         ${!n.read ? "bg-blue-50/40 dark:bg-blue-900/10" : ""}
         `}
       >
@@ -293,7 +293,7 @@ export function NotificationDropdown({ onClose }: Props) {
         )}
 
 
-        <div className="w-10 h-10 rounded-full bg-gradient-to-br bg-cyan-800 flex items-center justify-center text-white font-semibold text-sm shadow-md">
+        <div className="w-10 h-10 rounded-full bg-linear-to-r bg-cyan-800 flex items-center justify-center text-white font-semibold text-sm shadow-md">
           {n.sender?.firstName?.[0] || "U"}
         </div>
 
@@ -322,7 +322,7 @@ export function NotificationDropdown({ onClose }: Props) {
             console.log("[Notifications] Mark as read:", n.id);
             markAsRead(n.id);
           }}
-          className="opacity-0 group-hover:opacity-100 transition text-xs text-blue-500 hover:underline tracking-wide hover:brightness-125 transition-all duration-200 ease-in-out hover:scale-105 active:scale-95 disabled:opacity-60"
+          className="opacity-0 group-hover:opacity-100 text-xs text-blue-500 hover:underline tracking-wide hover:brightness-125 transition-all duration-200 ease-in-out hover:scale-105 active:scale-95 disabled:opacity-60"
         >
           Mark
         </button>
@@ -332,7 +332,7 @@ export function NotificationDropdown({ onClose }: Props) {
 
   <div className="p-3 border-t border-gray-200 dark:border-zinc-700 bg-white/60 dark:bg-zinc-900/60 backdrop-blur">
     <button
-      className="w-full text-sm font-medium text-blue-600 hover:text-blue-900 transition tracking-wide hover:brightness-125 transition-all duration-200 ease-in-out hover:scale-105 active:scale-95 disabled:opacity-60"
+      className="w-full text-sm font-medium text-blue-600 hover:text-blue-900 tracking-wide hover:brightness-125 transition-all duration-200 ease-in-out hover:scale-105 active:scale-95 disabled:opacity-60"
       onClick={() => console.log("[Notifications] View all")}
     >
       View all notifications →

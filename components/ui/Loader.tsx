@@ -18,7 +18,7 @@ const sizeConfig = {
 export default function Loader({
   title = "Loading...",
   subtitle = "Please wait",
-  size = "md",
+  size = "lg",
   className,
   ...props
 }: LoaderProps) {

@@ -1,8 +1,3 @@
-Below is a **complete, production-style `README.md`** you can directly paste into your GitHub repository.
-It is **practical, clean, and interview-ready**, matching your stack and real-world approach.
-
----
-
 # 🚀 Next.js Firebase Auth + Edge Middleware App
 
 A **modern full-stack authentication and user management system** built with **Next.js App Router**, **Firebase Authentication**, **Edge Middleware**, and **PostgreSQL (TypeORM)**.
@@ -269,8 +264,6 @@ next-typeorm-postgres/
 
 ```
 
----
-
 ## 🔐 Authentication Flow
 
 1. User logs in via **Firebase Auth (client)**
@@ -330,8 +323,6 @@ export class User {
 }
 ```
 
----
-
 ## 🌙 UI Highlights
 
 * Sticky Facebook-style Navbar
@@ -350,9 +341,6 @@ export class User {
 * Clean separation of concerns
 * Interview-ready architecture
 
-
-
-
 ## 👤 Author
 
 **Ibrahim Amjad**
@@ -364,4 +352,4 @@ Web Developer – Next.js, Firebase, PostgreSQL
 
 MIT License
 # Next-js-Social-App
-# Next-js-Social-App
+

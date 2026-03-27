@@ -81,6 +81,44 @@ import Loader from "../../components/ui/Loader";
 import { getAuth, getIdToken } from "firebase/auth";
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { fetchUserProfile, fetchMyPosts } from "../../app/api/profile-user/user";
+import { Button } from "../../components/ui/button";
+import { SidebarProvider } from "../../components/ui/sidebar";
+import { NotificationBell } from "../../src/components/notifications/NotificationBell";
+import ThemeDropdown from "../../components/ui/dropdown-theme";
+import ProfileDropdown from "../../components/ui/dropdown-profile";
+import { CreatePostModal } from "../../src/components/posts/CreatePostModal";
+import Image from "next/image";
+import { Avatar } from "../../components/ui/avatar";
+import { AvatarFallback } from "@radix-ui/react-avatar";
+import { Moon } from "lucide-react";
+import Link from "next/link";
+import ProfileContent from "../../src/components/membership/profile-page/ProfileContent";
+import SearchBar from "../../src/components/notifications/SearchBar";
+import SearchSuggestions from "../../src/components/notifications/SearchSuggestions";
+import { searchUsers } from "../../src/services/user.service";
+import { useDebounce } from "../../src/lib/useDebounce";
+import { useSearchParams } from "next/navigation";
+
+interface User {
+  id: string;
+  firstName?: string;
+  lastName?: string | null;
+  email: string;
+}
+// interface Post {
+//   id: string;
+//   content: string;
+//   images?: string[];
+//   createdAt: string;
+//   user: User;
+//   likesCount?: number;
+//   time?: string;
+// }
+
+interface FetchPostsResponse {
+  posts: Post[];
+  hasMore: boolean;
+}
 
 // -----------------------------
 // Types
@@ -113,9 +151,11 @@ interface Post {
   content: string;
   images?: string[];
   createdAt: string;
-  likesCount: number;
-  comments: Comment[];
-  commentsCount: number;
+  user?: User;
+  likesCount?: number;      // optional
+  comments?: Comment[];
+  commentsCount?: number;
+  time?: string;
 }
 
 // -----------------------------
@@ -157,12 +197,12 @@ const mergeLikesCommentsIntoPosts = (
     });
   });
 
-  return posts.map(post => ({
-    ...post,
-    likesCount: likesMap[post.id] || 0,
-    comments: commentsMap[post.id] || [],
-    commentsCount: commentsMap[post.id]?.length || 0,
-  }));
+    return posts.map(post => ({
+      ...post,
+      likesCount: likesMap[post.id] || 0,
+      comments: commentsMap[post.id] || [],
+      commentsCount: commentsMap[post.id]?.length || 0,
+    }));
 };
 
 // -----------------------------
@@ -193,8 +233,33 @@ const ProfilePage = () => {
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
-
+  const searchParams = useSearchParams();
+  const [openPost, setOpenPost] = useState(false);
+   const [query, setQuery] = useState("")
+  const [users, setUsers] = useState<any[]>([]);
+  const [searchLoading, setSearchLoading] = useState(false);
   const router = useRouter();
+const debouncedQuery = useDebounce(query, 400);
+  
+  // Determine where the user came from
+  const fromPage = searchParams.get("from") || "";
+  
+  useEffect(() => {
+  const fetchUsers = async () => {
+    if (!debouncedQuery) {
+      setUsers([]);
+      return;
+    }
+
+    setSearchLoading(true);
+    const results = await searchUsers(debouncedQuery);
+    setUsers(results);
+    setSearchLoading(false);
+  };
+
+  fetchUsers();
+}, [debouncedQuery]);
+
 
   useEffect(() => {
     document.title = "Profile | My Next JS App";
@@ -261,10 +326,19 @@ const ProfilePage = () => {
     }
   };
 
+  const handleSearch = async () => {
+    console.log(" Manual search:", query);
+    setSearchLoading(true);
+    const results = await searchUsers(query);
+
+    setUsers(results);
+    setSearchLoading(false);
+  };
+
   const handleEditProfile = () => router.push("/profile/edit");
 
   if (!user) {
-    return <Loader title="Loading profile..." subtitle="Fetching your account details" size="md" />;
+    return <Loader title="Loading profile..." subtitle="Fetching your account details" size="lg" />;
   }
 
   const loadMorePosts = () => {
@@ -272,14 +346,66 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 text-gray-900 dark:bg-zinc-950">
-      <div className="w-full px-10 py-10 space-y-6">
-        <div className="bg-gray-500/10 rounded-lg shadow-md p-6 space-y-4">
-          <ProfileHeader user={user} onEdit={handleEditProfile} showEditButton />
-          <ProfileCard posts={posts} hasMore={hasMore} loadMore={loadMorePosts} />
+    <SidebarProvider>
+      <div className="flex min-h-dvh w-full flex-col">
+        <header className="bg-card sticky top-0 z-50 border-b">
+          <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-4 py-2 sm:px-6">
+            <Link href="/feed" className="flex items-center gap-2">
+              <div className="w-[50px] h-[50px] rounded-full overflow-hidden">
+                <Image
+                  src="/logo.png" alt="Logo" width={50} height={50}
+                  className="object-cover w-full h-full scale-150"/>
+              </div>
+              <span className="lg:text-lg font-extrabold text-black italic tracking-wider animate-pulse">
+                Zentia
+              </span>
+            </Link>
+             {/* Search */}
+        <div className="relative w-full max-w-sm">
+          <SearchBar
+            value={query}
+            onChange={setQuery}
+            onSearch={handleSearch}
+            placeholder="Search users..."
+          />
+
+          {(query || searchLoading) && (
+            <SearchSuggestions users={users} loading={searchLoading} query={query} />
+          )}
         </div>
-      </div>
-    </div>
+
+            <div className="flex items-center gap-1.5">
+              <NotificationBell />
+              <ThemeDropdown
+                trigger={
+                  <Button variant="ghost" size="icon" className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800">
+                    <Moon className="size-5" />
+                  </Button>
+                }/>
+              <Button
+                size="sm" variant="secondary" onClick={() => setOpenPost(true)}
+                className="transition-all duration-200 ease-in-out hover:scale-105 active:scale-95">
+                New Post
+              </Button>
+            </div>
+          </div>
+        </header>
+
+        
+        <main className="flex-1 mt-4"> {/* ← mt-4 adds space under navbar */}
+          <div className="min-h-screen bg-slate-100 text-gray-900 dark:bg-zinc-950">
+            <div className="w-full px-10 py-10 space-y-6">
+              <div className="bg-gray-500/10 rounded-lg shadow-md p-6 space-y-4">
+                <ProfileHeader user={user} onEdit={handleEditProfile} showEditButton />
+                <ProfileCard posts={posts} hasMore={hasMore} loadMore={loadMorePosts} />
+              </div>
+            </div>
+          </div>
+        </main>
+
+        <CreatePostModal open={openPost} onClose={() => setOpenPost(false)} />
+          </div>
+    </SidebarProvider>
   );
 };
 
